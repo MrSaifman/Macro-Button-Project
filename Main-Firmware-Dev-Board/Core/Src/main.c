@@ -22,7 +22,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdbool.h>
+#include "LP5024_Driver.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,7 +46,13 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-
+uint8_t tx_buffer[64];		//Variable to store the output data 
+uint8_t report_buffer[64];		//Variable to receive the report buffer 
+uint8_t flag = 0;			//Variable to store the button flag 
+uint8_t flag_rx = 0;			//Variable to store the reception flag 
+ 
+//extern the USB handler 
+extern USBD_HandleTypeDef hUsbDeviceFS;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -85,7 +92,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  LP5024_Init();
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -94,17 +101,43 @@ int main(void)
   MX_I2C1_Init();
   MX_USB_Device_Init();
   /* USER CODE BEGIN 2 */
-
+  //To fill the buffer 
+  for (uint8_t i=0; i<64; i++) 
+  { 
+    tx_buffer[i] = i; 
+  } 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
+    if (flag_rx == 1) 
+    { 
+      //Check if the first byte of the report buffer equals 1 
+      if (report_buffer[0] == 1) 
+      { 
+        //Turn the LED7 to GREEN
+        LP5024_SetColor(LED7, 0x00FF00);
+      } 
+      //Check if the first byte of the report buffer equals 2 
+      else if (report_buffer[0] == 2) 
+      { 
+        //Turn the LED7 to RED
+        LP5024_SetColor(LED7, 0xFF0000);
+      } 
+      flag_rx = 0; 
+    } 
+    //To send the output data when the button is pressed 
+    if (flag==1) 
+    { 
+      USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, tx_buffer, 64); 
+      flag = 0;
+    }
+        /* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
-  }
+        /* USER CODE BEGIN 3 */
+    }
   /* USER CODE END 3 */
 }
 
