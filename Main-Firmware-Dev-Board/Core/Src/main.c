@@ -134,9 +134,9 @@ int main(void)
       USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, tx_buffer, 64); 
       flag = 0;
     }
-        /* USER CODE END WHILE */
+    /* USER CODE END WHILE */
 
-        /* USER CODE BEGIN 3 */
+    /* USER CODE BEGIN 3 */
     }
   /* USER CODE END 3 */
 }
