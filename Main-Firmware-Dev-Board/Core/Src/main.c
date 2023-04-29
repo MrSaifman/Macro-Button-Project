@@ -92,7 +92,6 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  LP5024_Init();
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -101,6 +100,7 @@ int main(void)
   MX_I2C1_Init();
   MX_USB_Device_Init();
   /* USER CODE BEGIN 2 */
+  LP5024_Init();
   //To fill the buffer 
   for (uint8_t i=0; i<64; i++) 
   { 
@@ -118,13 +118,26 @@ int main(void)
       if (report_buffer[0] == 1) 
       { 
         //Turn the LED7 to GREEN
-        LP5024_SetColor(LED7, 0x00FF00);
+        LP5024_SetColor(LED7, Adjust_Color_Brightness(0x00FF00, 20)); 
       } 
-      //Check if the first byte of the report buffer equals 2 
-      else if (report_buffer[0] == 2) 
+      //Buf[0]: Change LED
+      //Buf[1]: LED Num
+      //Buf[2]: Brightness
+      //Buf[3]: RED
+      //Buf[4]: GREEN
+      //Buf[5]: BLUE
+      else if (report_buffer[0] == 0x2) 
       { 
-        //Turn the LED7 to RED
-        LP5024_SetColor(LED7, 0xFF0000);
+        enum LED_Color_Reg led_reg = LedNum_To_ColorReg(report_buffer[1]);
+        uint32_t color = (report_buffer[3] << 16) | (report_buffer[4] << 8) | report_buffer[5];
+        
+        uint8_t brightness = report_buffer[2];
+
+        if(brightness > 100)
+          brightness = 100;
+
+        if(led_reg != LEDERR)
+          LP5024_SetColor(led_reg, Adjust_Color_Brightness(color, brightness));
       } 
       flag_rx = 0; 
     } 

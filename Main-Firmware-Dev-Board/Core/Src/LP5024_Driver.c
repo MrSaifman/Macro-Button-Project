@@ -5,7 +5,7 @@
 
 extern I2C_HandleTypeDef hi2c1;
 
-void LP5024_Init(void)
+HAL_StatusTypeDef LP5024_Init(void)
 {
   HAL_StatusTypeDef status;
   
@@ -55,4 +55,42 @@ void LP5024_GlobalOff(bool off)
     
     uint8_t i2cCmd1[] = {LP5024_DEVICE_CONFIG1, data};
     status = HAL_I2C_Master_Transmit(&hi2c1, LP5024_I2C_ADDR_BCST << 1, i2cCmd1, sizeof(i2cCmd1), HAL_MAX_DELAY);
+}
+
+uint32_t Adjust_Color_Brightness(uint32_t color, uint8_t brightness_level) {
+    // Extract the individual color components (red, green, and blue)
+    uint8_t red = (color >> 16) & 0xFF;
+    uint8_t green = (color >> 8) & 0xFF;
+    uint8_t blue = color & 0xFF;
+
+    // Scale the color components based on the brightness level
+    red = (red * brightness_level) / 255;
+    green = (green * brightness_level) / 255;
+    blue = (blue * brightness_level) / 255;
+
+    // Combine the modified color components back into a single value
+    return (red << 16) | (green << 8) | blue;
+}
+
+enum LED_Color_Reg LedNum_To_ColorReg(uint8_t led_index) {
+    switch (led_index) {
+        case 0:
+            return LED0;
+        case 1:
+            return LED1;
+        case 2:
+            return LED2;
+        case 3:
+            return LED3;
+        case 4:
+            return LED4;
+        case 5:
+            return LED5;
+        case 6:
+            return LED6;
+        case 7:
+            return LED7;
+        default:
+            return LEDERR;
+    }
 }

@@ -43,6 +43,7 @@ enum LED_Color_Reg {
     LED5 = 0x1E,
     LED6 = 0x21,
     LED7 = 0x24,
+    LEDERR = 0xFF,
 };
 
 enum LED_Brightness_Reg {
@@ -56,7 +57,9 @@ enum LED_Brightness_Reg {
     LED7_BRIGHTNESS = 0x0E,
 };
 
-void LP5024_Init(void);
+HAL_StatusTypeDef LP5024_Init(void);
 void LP5024_SetColor(enum LED_Color_Reg led_register, int hex_color);
 void LP5024_SetBrightness(enum LED_Brightness_Reg led_register, int brightness);
 void LP5024_GlobalOff(bool off);
+uint32_t Adjust_Color_Brightness(uint32_t color, uint8_t brightness_level);
+enum LED_Color_Reg LedNum_To_ColorReg(uint8_t led_index);
