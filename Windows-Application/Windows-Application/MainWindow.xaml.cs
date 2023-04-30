@@ -53,14 +53,14 @@ namespace Windows_Application
                 if (devices.Count > 0)
                 {
                     _device = await HidDevice.FromIdAsync(devices[0].Id, FileAccessMode.ReadWrite);
-                    DeviceStatusTextBlock.Text = "Device found";
+                    DeviceStatusTextBlock.Text = "BUTTON CONNECTED";
                     DeviceStatusTextBlock.Foreground = new SolidColorBrush(Colors.Green);
                 }
                 else
                 {
                     _device = null;
-                    DeviceStatusTextBlock.Text = "Device not found";
-                    DeviceStatusTextBlock.Foreground = new SolidColorBrush(Colors.Red);
+                    DeviceStatusTextBlock.Text = "BUTTON DISCONNECTED";
+                    DeviceStatusTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 0));
                 }
             });
         }
@@ -137,12 +137,6 @@ namespace Windows_Application
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             // Navigate to Settings
-        }
-
-        private void ExitButton_Click(object sender, RoutedEventArgs e)
-        {
-            // Exit the application
-            Application.Current.Shutdown();
         }
     }
 }
