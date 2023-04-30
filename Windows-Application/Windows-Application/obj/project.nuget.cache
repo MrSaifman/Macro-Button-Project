@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "BqHxCt5hTRYjwI30Xrf0eE4PxFswVBt3YfxMoLL4UW1gGn/fQrKMgqBGEDjOnLtLjYoNN1AdQDd9Dkx/mr2skw==",
+  "dgSpecHash": "ZAWYojYULUYepvEcQ5E5wNpw7hF5UjAndDrXa1i3FGuuIdF3T1kyfP1rSsV1Zze9+qY+NLT20ZaEu6n3G6aFaA==",
   "success": true,
   "projectFilePath": "F:\\Rage-Quit-Button-Project\\Windows-Application\\Windows-Application\\Windows-Application.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.windows.sdk.net.ref\\10.0.22621.28\\microsoft.windows.sdk.net.ref.10.0.22621.28.nupkg.sha512"
+  ],
   "logs": []
 }
