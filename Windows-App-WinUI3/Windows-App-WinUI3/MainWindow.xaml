@@ -10,7 +10,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Button x:Name="myButton" Click="myButton_Click">Click Me</Button>
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="30">
+        <Button x:Name="btnDashboard" Content="Dashboard" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited"/>
+        <Button x:Name="btnRageMode" Content="Rage Mode" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited"/>
+        <Button x:Name="btnMacroMode" Content="Macro Mode" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited"/>
+        <Button x:Name="btnLightning" Content="Lightning" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited"/>
     </StackPanel>
 </Window>

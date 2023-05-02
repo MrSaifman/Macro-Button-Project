@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -15,6 +16,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,9 +33,41 @@ namespace Windows_App_WinUI3
             this.InitializeComponent();
         }
 
-        private void myButton_Click(object sender, RoutedEventArgs e)
+
+        private void NavButton_Click(object sender, RoutedEventArgs e)
         {
-            myButton.Content = "Clicked";
+            Button clickedButton = sender as Button;
+
+            // Remove selection effect from all buttons
+            btnDashboard.BorderBrush = new SolidColorBrush(Colors.Transparent);
+            btnDashboard.Foreground = new SolidColorBrush(Colors.White);
+            btnRageMode.BorderBrush = new SolidColorBrush(Colors.Transparent);
+            btnRageMode.Foreground = new SolidColorBrush(Colors.White);
+            btnMacroMode.BorderBrush = new SolidColorBrush(Colors.Transparent);
+            btnMacroMode.Foreground = new SolidColorBrush(Colors.White);
+            btnLightning.BorderBrush = new SolidColorBrush(Colors.Transparent);
+            btnLightning.Foreground = new SolidColorBrush(Colors.White);
+
+            // Add selection effect to clicked button
+            clickedButton.BorderBrush = new SolidColorBrush(Color.FromArgb(0xff, 0xff, 0x6b, 0x27));
+            clickedButton.BorderThickness = new Thickness(5, 0, 0, 0);
+            clickedButton.Foreground = new SolidColorBrush(Color.FromArgb(0xff, 0xff, 0x6b, 0x27));
         }
+
+        private void NavButton_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            Button hoveredButton = sender as Button;
+            hoveredButton.Foreground = new SolidColorBrush(Color.FromArgb(0xff, 0xff, 0x6b, 0x27));
+        }
+
+        private void NavButton_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            Button hoveredButton = sender as Button;
+            hoveredButton.Foreground = new SolidColorBrush(Colors.White);
+        }
+
+
+
+
     }
 }
