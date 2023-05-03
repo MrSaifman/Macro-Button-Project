@@ -36,6 +36,7 @@ namespace Windows_App_WinUI3
         public App()
         {
             this.InitializeComponent();
+            // Enable window transitions
         }
 
         /// <summary>
