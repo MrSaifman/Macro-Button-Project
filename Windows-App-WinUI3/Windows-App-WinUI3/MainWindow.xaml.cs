@@ -45,6 +45,7 @@ namespace Windows_App_WinUI3
             {
                 _selectedButton.BorderBrush = new SolidColorBrush(Colors.Transparent);
                 _selectedButton.Foreground = new SolidColorBrush(Colors.White);
+                _selectedButton.BorderThickness = new Thickness(0);
             }
 
             // Add selection effect to clicked button
