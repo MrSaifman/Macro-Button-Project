@@ -48,14 +48,40 @@ namespace Windows_App_WinUI3
                 _selectedButton.BorderThickness = new Thickness(0);
             }
 
-            // Add selection effect to clicked button
-            clickedButton.BorderBrush = new SolidColorBrush(Color.FromArgb(0xff, 0xff, 0x6b, 0x27));
-            clickedButton.BorderThickness = new Thickness(5, 0, 0, 0);
-            clickedButton.Foreground = new SolidColorBrush(Color.FromArgb(0xff, 0xff, 0x6b, 0x27));
-
             // Set the clicked button as the selected button
             _selectedButton = clickedButton;
+
+            // Show the rectangle corresponding to the clicked button, and lower the opacity of the others
+            if (clickedButton == btnDashboard)
+            {
+                rectDashboard.Opacity = 1;
+                rectRageMode.Opacity = 0;
+                rectMacroMode.Opacity = 0;
+                rectLightning.Opacity = 0;
+            }
+            else if (clickedButton == btnRageMode)
+            {
+                rectDashboard.Opacity = 0;
+                rectRageMode.Opacity = 1;
+                rectMacroMode.Opacity = 0;
+                rectLightning.Opacity = 0;
+            }
+            else if (clickedButton == btnMacroMode)
+            {
+                rectDashboard.Opacity = 0;
+                rectRageMode.Opacity = 0;
+                rectMacroMode.Opacity = 1;
+                rectLightning.Opacity = 0;
+            }
+            else if (clickedButton == btnLightning)
+            {
+                rectDashboard.Opacity = 0;
+                rectRageMode.Opacity = 0;
+                rectMacroMode.Opacity = 0;
+                rectLightning.Opacity = 1;
+            }
         }
+
 
         private void NavButton_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
