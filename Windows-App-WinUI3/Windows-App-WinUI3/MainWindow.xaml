@@ -33,6 +33,8 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -47,9 +49,14 @@
                 <Rectangle x:Name="rectLightning" Grid.Row="3" Grid.Column="0" Fill="#ff6b27" Width="8" Height="30" RadiusX="5" RadiusY="5" Margin="0,10,0,10" Opacity="0"/>
                 <Button x:Name="btnLightning" Content="Lightning" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" Grid.Row="3" Grid.Column="1" FontSize="22"/>
 
+
+                <Rectangle x:Name="rectHelp" Grid.Row="4" Grid.Column="0" Fill="#ff6b27" Width="8" Height="30" RadiusX="5" RadiusY="5" Margin="0,10,0,10" Opacity="0"/>
+                <Button x:Name="btnHelp" Content="Help" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" Grid.Row="4" Grid.Column="1" FontSize="22"/>
+                <Rectangle x:Name="rectSettingsg" Grid.Row="5" Grid.Column="0" Fill="#ff6b27" Width="8" Height="30" RadiusX="5" RadiusY="5" Margin="0,10,0,10" Opacity="0"/>
+                <Button x:Name="btnSettings" Content="Settings" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" Grid.Row="5" Grid.Column="1" FontSize="22"/>
             </Grid>
 
-            <Grid Grid.Column="1" Background="White" Width="Auto" Height="Auto" Margin="120,40,40,40">
+            <Grid x:Name="DashboardScreen" Grid.Column="1" Background="White" Width="Auto" Height="Auto" Margin="120,40,40,40">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
@@ -63,7 +70,89 @@
                 <Rectangle Fill="#ff6b27" Width="550" Height="300" RadiusX="20" RadiusY="20" Margin="10" HorizontalAlignment="Right" Grid.Row="1" />
                 <Rectangle Fill="#ff6b27" Width="550" Height="300" RadiusX="20" RadiusY="20" Margin="10" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1" />
             </Grid>
-            
+
+            <Grid x:Name="RageModeScreen" Grid.Column="1" Background="Green" Width="Auto" Height="Auto" Margin="120,40,40,40" Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="4*"/>
+                        <RowDefinition Height="3*"/>
+                        <RowDefinition Height="3*"/>
+                        <RowDefinition Height="3*"/>
+                        <RowDefinition Height="3*"/>
+                        <RowDefinition Height="3*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Background="Red" Grid.Row="0" Grid.Column="0" Grid.RowSpan="1" Grid.ColumnSpan="3" CornerRadius="10" Margin="20,20,20,20">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock x:Name="GreetingTextBlock" Text="Hello, World!" FontSize="24" Margin="30,20,20,0"/>
+                            <ToggleSwitch x:Name="GreetingToggleSwitch" Margin="70,20,20,20" OnContent="" OffContent="" Toggled="GreetingToggleSwitch_Toggled" Width="120" Height="60" FontSize="20"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Background="Yellow" Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="3" CornerRadius="10" Margin="20,20,20,20">
+                        <!-- Second window content goes here -->
+                    </Grid>
+                    <Grid Background="Pink" Grid.Row="3" Grid.Column="0" Grid.RowSpan="3" Grid.ColumnSpan="4" CornerRadius="10" Margin="20,20,20,20">
+                        <!-- Third window content goes here -->
+                    </Grid>
+                    <Grid Background="Blue" Grid.Row="0" Grid.Column="3" Grid.RowSpan="3" Grid.ColumnSpan="5" CornerRadius="10" Margin="20,20,20,20">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,20,20,20">
+                            <AutoSuggestBox
+                            Background="Black"
+                            MinWidth="500"
+                            MaxWidth="320"
+                            Margin="0,8,0,12"
+                            CornerRadius="16"
+                            HorizontalAlignment="Center"
+                            PlaceholderText="Search Programs"
+                            QueryIcon="Find"
+                            TextChanged="SearchBox_TextChanged">
+                                <AutoSuggestBox.Resources>
+                                    <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="Gray" />
+                                    <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="LightGray" />
+                                </AutoSuggestBox.Resources>
+                            </AutoSuggestBox>
+
+                            <ListBox x:Name="ProgramsListBox" Grid.Row="1" Height="200" Margin="10">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="{Binding Icon}" Width="20" Height="20" Margin="0,0,10,0"/>
+                                            <TextBlock Text="{Binding Name}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            
+                        </StackPanel>
+
+                        <!-- Fourth window content goes here -->
+                    </Grid>
+                    <Grid Background="Orange" Grid.Row="3" Grid.Column="4" Grid.RowSpan="3" Grid.ColumnSpan="4" CornerRadius="10" Margin="20,20,20,20">
+                        <!-- Fifth window content goes here -->
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <Grid x:Name="MacroModeScreen" Grid.Column="1" Background="Orange" Width="Auto" Height="Auto" Margin="120,40,40,40" Visibility="Collapsed">
+                <Grid Grid.Column="1" Background="Red" Width="Auto" Height="Auto" Margin="120,40,40,40" CornerRadius="20">
+                    
+                </Grid>
+            </Grid>
+
+            <Grid x:Name="LightningScreen" Grid.Column="1" Background="Pink" Width="Auto" Height="Auto" Margin="120,40,40,40" Visibility="Collapsed">
+            </Grid>
+
         </Grid>
     </Grid>
 </Window>

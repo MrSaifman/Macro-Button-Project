@@ -18,6 +18,16 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
 
+using System.Windows;
+using Microsoft.UI.Xaml.Interop;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.Win32;
+using Windows.Storage;
+
+using System.Diagnostics;
+using System.Collections.ObjectModel;
+
+
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -31,6 +41,7 @@ namespace Windows_App_WinUI3
         public MainWindow()
         {
             this.InitializeComponent();
+            PopulateProgramsListBox();
         }
 
 
@@ -58,6 +69,11 @@ namespace Windows_App_WinUI3
                 rectRageMode.Opacity = 0;
                 rectMacroMode.Opacity = 0;
                 rectLightning.Opacity = 0;
+
+                DashboardScreen.Visibility = Visibility.Visible;
+                RageModeScreen.Visibility = Visibility.Collapsed;
+                MacroModeScreen.Visibility = Visibility.Collapsed;
+                LightningScreen.Visibility = Visibility.Collapsed;
             }
             else if (clickedButton == btnRageMode)
             {
@@ -65,6 +81,11 @@ namespace Windows_App_WinUI3
                 rectRageMode.Opacity = 1;
                 rectMacroMode.Opacity = 0;
                 rectLightning.Opacity = 0;
+
+                DashboardScreen.Visibility = Visibility.Collapsed;
+                RageModeScreen.Visibility = Visibility.Visible;
+                MacroModeScreen.Visibility = Visibility.Collapsed;
+                LightningScreen.Visibility = Visibility.Collapsed;
             }
             else if (clickedButton == btnMacroMode)
             {
@@ -72,6 +93,11 @@ namespace Windows_App_WinUI3
                 rectRageMode.Opacity = 0;
                 rectMacroMode.Opacity = 1;
                 rectLightning.Opacity = 0;
+
+                DashboardScreen.Visibility = Visibility.Collapsed;
+                RageModeScreen.Visibility = Visibility.Collapsed;
+                MacroModeScreen.Visibility = Visibility.Visible;
+                LightningScreen.Visibility = Visibility.Collapsed;
             }
             else if (clickedButton == btnLightning)
             {
@@ -79,9 +105,25 @@ namespace Windows_App_WinUI3
                 rectRageMode.Opacity = 0;
                 rectMacroMode.Opacity = 0;
                 rectLightning.Opacity = 1;
+
+                DashboardScreen.Visibility = Visibility.Collapsed;
+                RageModeScreen.Visibility = Visibility.Collapsed;
+                MacroModeScreen.Visibility = Visibility.Collapsed;
+                LightningScreen.Visibility = Visibility.Visible;
             }
         }
 
+        private void GreetingToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (GreetingToggleSwitch.IsOn)
+            {
+                GreetingTextBlock.Text = "Disable Current Application Close";
+            }
+            else
+            {
+                GreetingTextBlock.Text = "Enable Current Application Close";
+            }
+        }
 
         private void NavButton_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
@@ -102,6 +144,101 @@ namespace Windows_App_WinUI3
             if (_selectedButton != hoveredButton)
             {
                 hoveredButton.Foreground = new SolidColorBrush(Colors.White);
+            }
+        }
+
+        private async void PopulateProgramsListBox()
+        {
+            ObservableCollection<Program> programs = new ObservableCollection<Program>();
+
+            // Get the list of installed programs from the registry
+            string uninstallKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(uninstallKey))
+            {
+                foreach (string subKeyName in key.GetSubKeyNames())
+                {
+                    using (RegistryKey subKey = key.OpenSubKey(subKeyName))
+                    {
+                        try
+                        {
+                            string name = subKey.GetValue("DisplayName") as string;
+                            string iconPath = subKey.GetValue("DisplayIcon") as string;
+
+                            if (!string.IsNullOrEmpty(name))
+                            {
+                                // Try to resolve the icon file path
+                                if (!string.IsNullOrEmpty(iconPath))
+                                {
+                                    iconPath = Path.GetFullPath(iconPath);
+                                }
+
+                                // Create a new Program object with the name and icon of the installed program
+                                BitmapImage icon = null;
+                                if (!string.IsNullOrEmpty(iconPath))
+                                {
+                                    icon = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
+                                }
+                                programs.Add(new Program { Name = name, Icon = icon });
+                            }
+                        }
+                        catch { }
+                    }
+                }
+            }
+
+            ProgramsListBox.ItemsSource = programs;
+        }
+
+        public class Program
+        {
+            public string Name { get; set; }
+            public BitmapImage Icon { get; set; }
+        }
+
+        private async void SearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            // Get the search term from the AutoSuggestBox
+            string searchTerm = sender.Text.ToLowerInvariant();
+
+            // Get the list of installed programs from the registry
+            string uninstallKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(uninstallKey))
+            {
+                ObservableCollection<Program> programs = new ObservableCollection<Program>();
+
+                // Filter the list of programs based on the search term
+                foreach (string subKeyName in key.GetSubKeyNames())
+                {
+                    using (RegistryKey subKey = key.OpenSubKey(subKeyName))
+                    {
+                        try
+                        {
+                            string name = subKey.GetValue("DisplayName") as string;
+                            string iconPath = subKey.GetValue("DisplayIcon") as string;
+
+                            if (!string.IsNullOrEmpty(name) && name.ToLowerInvariant().Contains(searchTerm))
+                            {
+                                // Try to resolve the icon file path
+                                if (!string.IsNullOrEmpty(iconPath))
+                                {
+                                    iconPath = Path.GetFullPath(iconPath);
+                                }
+
+                                // Create a new Program object with the name and icon of the installed program
+                                BitmapImage icon = null;
+                                if (!string.IsNullOrEmpty(iconPath))
+                                {
+                                    icon = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
+                                }
+                                programs.Add(new Program { Name = name, Icon = icon });
+                            }
+                        }
+                        catch { }
+                    }
+                }
+
+                // Set the ItemsSource of the ListBox to the filtered list of programs
+                ProgramsListBox.ItemsSource = programs;
             }
         }
     }
