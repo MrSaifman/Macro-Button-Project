@@ -151,37 +151,30 @@ namespace Windows_App_WinUI3
         {
             ObservableCollection<Program> programs = new ObservableCollection<Program>();
 
-            // Get the list of installed programs from the registry
-            string uninstallKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(uninstallKey))
+            // Define the uninstall keys
+            string[] uninstallKeys =
             {
-                foreach (string subKeyName in key.GetSubKeyNames())
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+                @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+            };
+
+            // Check both HKEY_LOCAL_MACHINE and HKEY_CURRENT_USER
+            RegistryKey[] baseKeys =
+            {
+                RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64),
+                RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64)
+            };
+
+            foreach (var baseKey in baseKeys)
+            {
+                foreach (var keyPath in uninstallKeys)
                 {
-                    using (RegistryKey subKey = key.OpenSubKey(subKeyName))
+                    using (RegistryKey key = baseKey.OpenSubKey(keyPath))
                     {
-                        try
+                        if (key != null)
                         {
-                            string name = subKey.GetValue("DisplayName") as string;
-                            string iconPath = subKey.GetValue("DisplayIcon") as string;
-
-                            if (!string.IsNullOrEmpty(name))
-                            {
-                                // Try to resolve the icon file path
-                                if (!string.IsNullOrEmpty(iconPath))
-                                {
-                                    iconPath = Path.GetFullPath(iconPath);
-                                }
-
-                                // Create a new Program object with the name and icon of the installed program
-                                BitmapImage icon = null;
-                                if (!string.IsNullOrEmpty(iconPath))
-                                {
-                                    icon = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
-                                }
-                                programs.Add(new Program { Name = name, Icon = icon });
-                            }
+                            ProcessKeyForPrograms(key, programs);
                         }
-                        catch { }
                     }
                 }
             }
@@ -200,45 +193,70 @@ namespace Windows_App_WinUI3
             // Get the search term from the AutoSuggestBox
             string searchTerm = sender.Text.ToLowerInvariant();
 
-            // Get the list of installed programs from the registry
-            string uninstallKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(uninstallKey))
+            ObservableCollection<Program> programs = new ObservableCollection<Program>();
+
+            // Define the uninstall keys
+            string[] uninstallKeys =
             {
-                ObservableCollection<Program> programs = new ObservableCollection<Program>();
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+                @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+            };
 
-                // Filter the list of programs based on the search term
-                foreach (string subKeyName in key.GetSubKeyNames())
+            // Check both HKEY_LOCAL_MACHINE and HKEY_CURRENT_USER
+            RegistryKey[] baseKeys =
+            {
+                RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64),
+                RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64)
+            };
+
+            foreach (var baseKey in baseKeys)
+            {
+                foreach (var keyPath in uninstallKeys)
                 {
-                    using (RegistryKey subKey = key.OpenSubKey(subKeyName))
+                    using (RegistryKey key = baseKey.OpenSubKey(keyPath))
                     {
-                        try
+                        if (key != null)
                         {
-                            string name = subKey.GetValue("DisplayName") as string;
-                            string iconPath = subKey.GetValue("DisplayIcon") as string;
-
-                            if (!string.IsNullOrEmpty(name) && name.ToLowerInvariant().Contains(searchTerm))
-                            {
-                                // Try to resolve the icon file path
-                                if (!string.IsNullOrEmpty(iconPath))
-                                {
-                                    iconPath = Path.GetFullPath(iconPath);
-                                }
-
-                                // Create a new Program object with the name and icon of the installed program
-                                BitmapImage icon = null;
-                                if (!string.IsNullOrEmpty(iconPath))
-                                {
-                                    icon = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
-                                }
-                                programs.Add(new Program { Name = name, Icon = icon });
-                            }
+                            ProcessKeyForPrograms(key, programs, searchTerm);
                         }
-                        catch { }
                     }
                 }
+            }
 
-                // Set the ItemsSource of the ListBox to the filtered list of programs
-                ProgramsListBox.ItemsSource = programs;
+            // Set the ItemsSource of the ListBox to the filtered list of programs
+            ProgramsListBox.ItemsSource = programs;
+        }
+
+        private void ProcessKeyForPrograms(RegistryKey key, ObservableCollection<Program> programs, string searchTerm = null)
+        {
+            foreach (string subKeyName in key.GetSubKeyNames())
+            {
+                using (RegistryKey subKey = key.OpenSubKey(subKeyName))
+                {
+                    try
+                    {
+                        string name = subKey.GetValue("DisplayName") as string;
+                        string iconPath = subKey.GetValue("DisplayIcon") as string;
+
+                        if (!string.IsNullOrEmpty(name) && (searchTerm == null || name.ToLowerInvariant().Contains(searchTerm)))
+                        {
+                            // Try to resolve the icon file path
+                            if (!string.IsNullOrEmpty(iconPath))
+                            {
+                                iconPath = Path.GetFullPath(iconPath);
+                            }
+
+                            // Create a new Program object with the name and icon of the installed program
+                            BitmapImage icon = null;
+                            if (!string.IsNullOrEmpty(iconPath))
+                            {
+                                icon = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
+                            }
+                            programs.Add(new Program { Name = name, Icon = icon });
+                        }
+                    }
+                    catch { }
+                }
             }
         }
     }
