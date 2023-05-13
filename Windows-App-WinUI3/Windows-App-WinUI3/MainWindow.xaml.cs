@@ -27,6 +27,8 @@ using Windows.Storage;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 
+using System.Text.Json;
+
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -42,6 +44,7 @@ namespace Windows_App_WinUI3
         {
             this.InitializeComponent();
             PopulateProgramsListBox();
+            PopulateBlackAndWhiteLists();
         }
 
 
@@ -186,6 +189,24 @@ namespace Windows_App_WinUI3
         {
             public string Name { get; set; }
             public BitmapImage Icon { get; set; }
+            public string Path { get; set; }
+
+            public override bool Equals(object obj)
+            {
+                if (obj == null || GetType() != obj.GetType())
+                {
+                    return false;
+                }
+
+                var program = (Program)obj;
+                return Name == program.Name && Icon.UriSource == program.Icon.UriSource && Path == program.Path;
+            }
+
+            // override object.GetHashCode
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Name, Icon.UriSource, Path);
+            }
         }
 
         private async void SearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
@@ -237,6 +258,7 @@ namespace Windows_App_WinUI3
                     {
                         string name = subKey.GetValue("DisplayName") as string;
                         string iconPath = subKey.GetValue("DisplayIcon") as string;
+                        string appPath = subKey.GetValue("InstallLocation") as string; // Get the install location
 
                         if (!string.IsNullOrEmpty(name) && (searchTerm == null || name.ToLowerInvariant().Contains(searchTerm)))
                         {
@@ -246,18 +268,180 @@ namespace Windows_App_WinUI3
                                 iconPath = Path.GetFullPath(iconPath);
                             }
 
-                            // Create a new Program object with the name and icon of the installed program
+                            // Create a new Program object with the name, icon, and path of the installed program
                             BitmapImage icon = null;
                             if (!string.IsNullOrEmpty(iconPath))
                             {
                                 icon = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
                             }
-                            programs.Add(new Program { Name = name, Icon = icon });
+                            programs.Add(new Program { Name = name, Icon = icon, Path = appPath });
                         }
                     }
                     catch { }
                 }
             }
         }
+
+        private void AddToBlacklist_Click(object sender, RoutedEventArgs e)
+        {
+            Program selectedProgram = ProgramsListBox.SelectedItem as Program;
+            if (selectedProgram != null)
+            {
+                string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+                string dataDirectory = Path.Combine(projectDirectory, "Data");
+                string blacklistFilePath = Path.Combine(dataDirectory, "blacklist.json");
+
+                // Ensure the Data directory exists
+                Directory.CreateDirectory(dataDirectory);
+
+                ObservableCollection<Program> blacklist;
+
+                // Read the existing blacklist file if it exists
+                if (File.Exists(blacklistFilePath))
+                {
+                    string jsonString = File.ReadAllText(blacklistFilePath);
+                    blacklist = JsonSerializer.Deserialize<ObservableCollection<Program>>(jsonString);
+                }
+                else
+                {
+                    // If it doesn't exist, create a new list
+                    blacklist = new ObservableCollection<Program>();
+                }
+
+                // Add the selected program to the list
+                if (!blacklist.Any(p => p.Name == selectedProgram.Name))
+                {
+                    blacklist.Add(selectedProgram);
+                }
+
+                // Save the list back to the file
+                string newJsonString = JsonSerializer.Serialize(blacklist);
+
+                File.WriteAllText(blacklistFilePath, newJsonString);
+
+                // Update the ListBox
+                BlackListBox.ItemsSource = blacklist;
+            }
+        }
+
+        private void AddToWhitelist_Click(object sender, RoutedEventArgs e)
+        {
+            Program selectedProgram = ProgramsListBox.SelectedItem as Program;
+            if (selectedProgram != null)
+            {
+                string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+                string dataDirectory = Path.Combine(projectDirectory, "Data");
+                string whitelistFilePath = Path.Combine(dataDirectory, "whitelist.json");
+
+                // Ensure the Data directory exists
+                Directory.CreateDirectory(dataDirectory);
+
+                ObservableCollection<Program> whitelist;
+
+                // Read the existing whitelist file if it exists
+                if (File.Exists(whitelistFilePath))
+                {
+                    string jsonString = File.ReadAllText(whitelistFilePath);
+                    whitelist = JsonSerializer.Deserialize<ObservableCollection<Program>>(jsonString);
+                }
+                else
+                {
+                    // If it doesn't exist, create a new list
+                    whitelist = new ObservableCollection<Program>();
+                }
+
+                // Add the selected program to the list
+                if (!whitelist.Any(p => p.Name == selectedProgram.Name))
+                {
+                    whitelist.Add(selectedProgram);
+                }
+
+                // Save the list back to the file
+                string newJsonString = JsonSerializer.Serialize(whitelist);
+
+                File.WriteAllText(whitelistFilePath, newJsonString);
+                // Update the ListBox
+                WhiteListBox.ItemsSource = whitelist;
+            }
+        }
+
+        private void PopulateBlackAndWhiteLists()
+        {
+            string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+            string dataDirectory = Path.Combine(projectDirectory, "Data");
+
+            string blacklistFilePath = Path.Combine(dataDirectory, "blacklist.json");
+            string whitelistFilePath = Path.Combine(dataDirectory, "whitelist.json");
+
+            // Ensure the Data directory exists
+            Directory.CreateDirectory(dataDirectory);
+
+            if (File.Exists(blacklistFilePath))
+            {
+                string jsonString = File.ReadAllText(blacklistFilePath);
+                BlackListBox.ItemsSource = JsonSerializer.Deserialize<ObservableCollection<Program>>(jsonString);
+            }
+
+            if (File.Exists(whitelistFilePath))
+            {
+                string jsonString = File.ReadAllText(whitelistFilePath);
+                WhiteListBox.ItemsSource = JsonSerializer.Deserialize<ObservableCollection<Program>>(jsonString);
+            }
+        }
+
+        private void RemoveFromWhitelist_Click(object sender, RoutedEventArgs e)
+        {
+            string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+            string dataDirectory = Path.Combine(projectDirectory, "Data");
+            string whitelistFilePath = Path.Combine(dataDirectory, "whitelist.json");
+
+            // Get the selected program
+            Program selectedProgram = (Program)WhiteListBox.SelectedItem;
+
+            if (selectedProgram != null)
+            {
+                // Load the current whitelist
+                string jsonString = File.ReadAllText(whitelistFilePath);
+                List<Program> whitelist = JsonSerializer.Deserialize<List<Program>>(jsonString);
+
+                // Remove the selected program
+                whitelist.RemoveAll(p => p.Name == selectedProgram.Name);
+
+                // Save the list back to the file
+                string newJsonString = JsonSerializer.Serialize(whitelist);
+                File.WriteAllText(whitelistFilePath, newJsonString);
+
+                // Update the ListBox
+                WhiteListBox.ItemsSource = whitelist;
+            }
+        }
+
+        private void RemoveFromBlacklist_Click(object sender, RoutedEventArgs e)
+        {
+            string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+            string dataDirectory = Path.Combine(projectDirectory, "Data");
+            string blacklistFilePath = Path.Combine(dataDirectory, "blacklist.json");
+
+            // Get the selected program
+            Program selectedProgram = (Program)BlackListBox.SelectedItem;
+
+            if (selectedProgram != null)
+            {
+                // Load the current blacklist
+                string jsonString = File.ReadAllText(blacklistFilePath);
+                List<Program> blacklist = JsonSerializer.Deserialize<List<Program>>(jsonString);
+
+                // Remove the selected program
+                blacklist.RemoveAll(p => p.Name == selectedProgram.Name);
+
+                // Save the list back to the file
+                string newJsonString = JsonSerializer.Serialize(blacklist);
+                File.WriteAllText(blacklistFilePath, newJsonString);
+
+                // Update the ListBox
+                BlackListBox.ItemsSource = blacklist;
+            }
+        }
+
     }
 }
