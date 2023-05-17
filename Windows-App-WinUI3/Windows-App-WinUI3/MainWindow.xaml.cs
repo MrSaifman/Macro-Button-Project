@@ -49,6 +49,7 @@ namespace Windows_App_WinUI3
 
 
         private Button _selectedButton;
+        private Button _currentColorButton;
 
         private void NavButton_Click(object sender, RoutedEventArgs e)
         {
@@ -71,48 +72,48 @@ namespace Windows_App_WinUI3
                 rectDashboard.Opacity = 1;
                 rectRageMode.Opacity = 0;
                 rectMacroMode.Opacity = 0;
-                rectLightning.Opacity = 0;
+                rectLighting.Opacity = 0;
 
                 DashboardScreen.Visibility = Visibility.Visible;
                 RageModeScreen.Visibility = Visibility.Collapsed;
                 MacroModeScreen.Visibility = Visibility.Collapsed;
-                LightningScreen.Visibility = Visibility.Collapsed;
+                LightingScreen.Visibility = Visibility.Collapsed;
             }
             else if (clickedButton == btnRageMode)
             {
                 rectDashboard.Opacity = 0;
                 rectRageMode.Opacity = 1;
                 rectMacroMode.Opacity = 0;
-                rectLightning.Opacity = 0;
+                rectLighting.Opacity = 0;
 
                 DashboardScreen.Visibility = Visibility.Collapsed;
                 RageModeScreen.Visibility = Visibility.Visible;
                 MacroModeScreen.Visibility = Visibility.Collapsed;
-                LightningScreen.Visibility = Visibility.Collapsed;
+                LightingScreen.Visibility = Visibility.Collapsed;
             }
             else if (clickedButton == btnMacroMode)
             {
                 rectDashboard.Opacity = 0;
                 rectRageMode.Opacity = 0;
                 rectMacroMode.Opacity = 1;
-                rectLightning.Opacity = 0;
+                rectLighting.Opacity = 0;
 
                 DashboardScreen.Visibility = Visibility.Collapsed;
                 RageModeScreen.Visibility = Visibility.Collapsed;
                 MacroModeScreen.Visibility = Visibility.Visible;
-                LightningScreen.Visibility = Visibility.Collapsed;
+                LightingScreen.Visibility = Visibility.Collapsed;
             }
-            else if (clickedButton == btnLightning)
+            else if (clickedButton == btnLighting)
             {
                 rectDashboard.Opacity = 0;
                 rectRageMode.Opacity = 0;
                 rectMacroMode.Opacity = 0;
-                rectLightning.Opacity = 1;
+                rectLighting.Opacity = 1;
 
                 DashboardScreen.Visibility = Visibility.Collapsed;
                 RageModeScreen.Visibility = Visibility.Collapsed;
                 MacroModeScreen.Visibility = Visibility.Collapsed;
-                LightningScreen.Visibility = Visibility.Visible;
+                LightingScreen.Visibility = Visibility.Visible;
             }
         }
 
@@ -440,6 +441,20 @@ namespace Windows_App_WinUI3
 
                 // Update the ListBox
                 BlackListBox.ItemsSource = blacklist;
+            }
+        }
+
+        private void ColorButton_Click(object sender, RoutedEventArgs e)
+        {
+            _currentColorButton = (Button)sender;
+            ColorPickerControl.ColorChanged += ColorPickerControl_ColorChanged;
+        }
+
+        private void ColorPickerControl_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
+        {
+            if (_currentColorButton != null)
+            {
+                _currentColorButton.Background = new SolidColorBrush(sender.Color);
             }
         }
 
