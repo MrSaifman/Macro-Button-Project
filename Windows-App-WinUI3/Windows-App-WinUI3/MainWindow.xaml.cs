@@ -17,18 +17,17 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
-
 using System.Windows;
 using Microsoft.UI.Xaml.Interop;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.Win32;
 using Windows.Storage;
-
 using System.Diagnostics;
 using System.Collections.ObjectModel;
-
 using System.Text.Json;
 
+using Windows_App_WinUI3.FileHandlers;
+using System.Drawing;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -40,11 +39,21 @@ namespace Windows_App_WinUI3
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+
+        private JsonManager jsonManager;
+
         public MainWindow()
         {
             this.InitializeComponent();
+
+            jsonManager = new JsonManager();
+            jsonManager.EnsureDefaultSettingsExist();
+            jsonManager.currentLightingMode = "IdleLighting";
+            
             PopulateProgramsListBox();
             PopulateBlackAndWhiteLists();
+            PopulateLightSettings("IdleLighting");
+
         }
 
 
@@ -136,7 +145,7 @@ namespace Windows_App_WinUI3
             // Change the button text color to orange if it's not the selected button
             if (_selectedButton != hoveredButton)
             {
-                hoveredButton.Foreground = new SolidColorBrush(Color.FromArgb(0xff, 0xff, 0x6b, 0x27));
+                hoveredButton.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xff, 0xff, 0x6b, 0x27));
             }
         }
 
@@ -447,7 +456,9 @@ namespace Windows_App_WinUI3
         private void ColorButton_Click(object sender, RoutedEventArgs e)
         {
             _currentColorButton = (Button)sender;
+            ColorPickerControl.Color = ((SolidColorBrush)_currentColorButton.Background).Color;
             ColorPickerControl.ColorChanged += ColorPickerControl_ColorChanged;
+            ColorPickerControl.Visibility = Visibility.Visible;
         }
 
         private void ColorPickerControl_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
@@ -456,6 +467,138 @@ namespace Windows_App_WinUI3
             {
                 _currentColorButton.Background = new SolidColorBrush(sender.Color);
             }
+        }
+        private void ColorPickerControl_LostFocus(object sender, RoutedEventArgs e)
+        {
+            ColorPickerControl.Visibility = Visibility.Collapsed;
+            ColorPickerControl.ColorChanged -= ColorPickerControl_ColorChanged;
+            // Update setting in JSON file
+            if (_currentColorButton != null)
+            {
+                string settingName = _currentColorButton.Tag.ToString();
+                jsonManager.UpdateSetting(jsonManager.currentLightingMode, settingName, ColorPickerControl.Color.ToString());
+            }
+        }
+
+        private void LightingModeChange(object sender, RoutedEventArgs e)
+        {
+            // Reset all buttons to black
+            Button1.Background = new SolidColorBrush(Colors.Black);
+            Button2.Background = new SolidColorBrush(Colors.Black);
+            Button3.Background = new SolidColorBrush(Colors.Black);
+
+            // Change the clicked button to orange
+            Button button = sender as Button;
+            if (button != null)
+            {
+                button.Background = new SolidColorBrush(Colors.Orange);
+
+                if (jsonManager.lightingModeMapping.TryGetValue(button.Content.ToString(), out string mode))
+                {
+                    PopulateLightSettings(mode);
+                    jsonManager.currentLightingMode = mode;
+                }
+            }
+        }
+
+        public void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (jsonManager == null)
+            {
+                // Initialize jsonManager here, or return if it's not supposed to be null at this point.
+                return;
+            }
+
+            ComboBox comboBox = (ComboBox)sender;
+            ComboBoxItem selectedItem = (ComboBoxItem)comboBox.SelectedItem;
+            string selectedPattern = (string)selectedItem.Content;
+
+            jsonManager.LightUpPattern = selectedPattern;
+            jsonManager.UpdateSetting(jsonManager.currentLightingMode, "LightUpPattern", selectedPattern);
+        }
+
+        public void Slider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        {
+            if (jsonManager == null)
+            {
+                // Initialize jsonManager here, or return if it's not supposed to be null at this point.
+                return;
+            }
+
+            Slider slider = (Slider)sender;
+            double value = slider.Value;
+
+            string settingName = (string)slider.Tag;
+
+            jsonManager.UpdateSetting(jsonManager.currentLightingMode, settingName, value.ToString());
+        }
+
+        public static Windows.UI.Color ConvertStringToColor(string hex)
+        {
+            if (string.IsNullOrEmpty(hex) || hex.Length != 9 || !hex.StartsWith("#"))
+            {
+                throw new FormatException("The hex color string is not in the correct format.");
+            }
+
+            hex = hex.Substring(1);  // remove the hashtag
+
+            var a = (byte)(Convert.ToUInt32(hex.Substring(0, 2), 16));
+            var r = (byte)(Convert.ToUInt32(hex.Substring(2, 2), 16));
+            var g = (byte)(Convert.ToUInt32(hex.Substring(4, 2), 16));
+            var b = (byte)(Convert.ToUInt32(hex.Substring(6, 2), 16));
+            return Windows.UI.Color.FromArgb(a, r, g, b);
+        }
+
+        public void PopulateLightSettings(string lightingCategory)
+        {
+            // Validate the input
+            List<string> validCategories = new List<string> { "IdleLighting", "ButtonPressLighting", "LidLiftLighting" };
+            if (!validCategories.Contains(lightingCategory))
+            {
+                throw new ArgumentException($"{lightingCategory} is not a valid lighting category. Valid categories are {string.Join(", ", validCategories)}");
+            }
+
+            // lighting settings
+            var lightUpPattern = jsonManager.ReadSetting(lightingCategory, "LightUpPattern");
+            var brightness = int.Parse(jsonManager.ReadSetting(lightingCategory, "Brightness"));
+            var patternSpeed = int.Parse(jsonManager.ReadSetting(lightingCategory, "PatternSpeed"));
+            var frameColor1 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "FrameColor1"));
+            var frameColor2 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "FrameColor2"));
+            var buttonColor1 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "ButtonColor1"));
+            var buttonColor2 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "ButtonColor2"));
+
+            // Assign these values to the corresponding controls
+            foreach (ComboBoxItem item in lightUpPatternComboBox.Items)
+            {
+                if (item.Content.ToString() == lightUpPattern)
+                {
+                    // Temporarily remove the event handler.
+                    lightUpPatternComboBox.SelectionChanged -= ComboBox_SelectionChanged;
+
+                    lightUpPatternComboBox.SelectedItem = item;
+
+                    // Re-add the event handler.
+                    lightUpPatternComboBox.SelectionChanged += ComboBox_SelectionChanged;
+
+                    break;
+                }
+            }
+
+            // Temporarily remove the event handlers for the sliders.
+            brightnessSlider.ValueChanged -= Slider_ValueChanged;
+            patternSlider.ValueChanged -= Slider_ValueChanged;
+
+            brightnessSlider.Value = brightness;
+            patternSlider.Value = patternSpeed;
+
+            // Re-add the event handlers for the sliders.
+            brightnessSlider.ValueChanged += Slider_ValueChanged;
+            patternSlider.ValueChanged += Slider_ValueChanged;
+
+            FrameColorButton1.Background = new SolidColorBrush(frameColor1);
+            FrameColorButton2.Background = new SolidColorBrush(frameColor2);
+            ButtonColorButton1.Background = new SolidColorBrush(buttonColor1);
+            ButtonColorButton2.Background = new SolidColorBrush(buttonColor2);
         }
 
     }
