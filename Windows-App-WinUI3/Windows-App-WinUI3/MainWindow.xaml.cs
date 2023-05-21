@@ -41,10 +41,14 @@ namespace Windows_App_WinUI3
     {
 
         private JsonManager jsonManager;
+        private USBDeviceManager deviceManager;
 
         public MainWindow()
         {
             this.InitializeComponent();
+
+            deviceManager = new USBDeviceManager();
+            deviceManager.DataReceived += deviceManager.DeviceManager_DataReceived; // Subscribe to the event here
 
             jsonManager = new JsonManager();
             jsonManager.EnsureDefaultSettingsExist();
@@ -54,8 +58,22 @@ namespace Windows_App_WinUI3
             PopulateBlackAndWhiteLists();
             PopulateLightSettings("IdleLighting");
 
+            InitializeDevice();
+
         }
 
+        private async void InitializeDevice()
+        {
+            await deviceManager.InitializeDeviceAsync();
+
+            byte[] reportData = new byte[]
+            {
+                0x00, 0x02, 0x07, 0x06, 0xFF, 0xFF, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+            };
+
+            await deviceManager.ReadWriteToHidDevice(reportData);
+        }
 
         private Button _selectedButton;
         private Button _currentColorButton;
