@@ -65,14 +65,6 @@ namespace Windows_App_WinUI3
         private async void InitializeDevice()
         {
             await deviceManager.InitializeDeviceAsync();
-
-            byte[] reportData = new byte[]
-            {
-                0x00, 0x02, 0x07, 0x06, 0xFF, 0xFF, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-            };
-
-            await deviceManager.ReadWriteToHidDevice(reportData);
         }
 
         private Button _selectedButton;
@@ -535,7 +527,7 @@ namespace Windows_App_WinUI3
             jsonManager.UpdateSetting(jsonManager.currentLightingMode, "LightUpPattern", selectedPattern);
         }
 
-        public void Slider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        public async void Slider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             if (jsonManager == null)
             {
@@ -549,6 +541,13 @@ namespace Windows_App_WinUI3
             string settingName = (string)slider.Tag;
 
             jsonManager.UpdateSetting(jsonManager.currentLightingMode, settingName, value.ToString());
+
+            byte[] reportData = new byte[]
+            {
+                0x01, 0x01, 0x02, 0x00, 0x00, Convert.ToByte(value)
+            };
+
+            await deviceManager.ReadWriteToHidDevice(reportData);
         }
 
         public static Windows.UI.Color ConvertStringToColor(string hex)

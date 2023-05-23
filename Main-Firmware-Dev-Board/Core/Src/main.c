@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdbool.h>
 #include "LP5024_Driver.h"
+#include "LED_Handler.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,6 +34,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+  #define REPORT_NONE          0x00
+  #define REPORT_IDLE_LIGHT    0x01
+  #define REPORT_BUTTON_LIGHT  0x02
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -115,37 +119,55 @@ int main(void)
     if (flag_rx == 1) 
     { 
       //Check if the first byte of the report buffer equals 1 
-      if (report_buffer[0] == 1) 
-      { 
-        //Turn the LED7 to GREEN
-        LP5024_SetColor(LED7, Adjust_Color_Brightness(0x00FF00, 20)); 
+      if (report_buffer[0] == REPORT_IDLE_LIGHT) 
+      {
+        uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
+        UpdateLightingConfiguration(&idleLightingConfig, report_buffer[1], theSetting);
       } 
-      //Buf[0]: Change LED
-      //Buf[1]: LED Num
-      //Buf[2]: Brightness
-      //Buf[3]: RED
-      //Buf[4]: GREEN
-      //Buf[5]: BLUE
-      else if (report_buffer[0] == 0x2) 
+
+      else if (report_buffer[0] == REPORT_BUTTON_LIGHT) 
       { 
-        enum LED_Color_Reg led_reg = LedNum_To_ColorReg(report_buffer[1]);
-        uint32_t color = (report_buffer[3] << 16) | (report_buffer[4] << 8) | report_buffer[5];
+        bool placeholder = 1;
+              //Buf[0]: Change LED
+          //Buf[1]: LED Num
+          //Buf[2]: Brightness
+          //Buf[3]: RED
+          //Buf[4]: GREEN
+          //Buf[5]: BLUE
+
+        //enum LED_Color_Reg led_reg = LedNum_To_ColorReg(report_buffer[1]);
+        // uint32_t color = (report_buffer[3] << 16) | (report_buffer[4] << 8) | report_buffer[5];
         
-        uint8_t brightness = report_buffer[2];
+        // uint8_t brightness = report_buffer[2];
 
-        if(brightness > 100)
-          brightness = 100;
+        // if(brightness > 100)
+        //   brightness = 100;
 
-        if(led_reg != LEDERR)
-          LP5024_SetColor(led_reg, Adjust_Color_Brightness(color, brightness));
+        // if(led_reg != LEDERR)
+        //   LP5024_SetColor(led_reg, Adjust_Color_Brightness(color, brightness));
+
+        //Turn the LED7 to GREEN
+        // LP5024_SetColor(LED7, Adjust_Color_Brightness(0x00FF00, 20)); 
       } 
       flag_rx = 0; 
     } 
     //To send the output data when the button is pressed 
-    if (HAL_GPIO_ReadPin(BTN1_GPIO_Port, BTN1_Pin))
+    if (HAL_GPIO_ReadPin(BTN1_GPIO_Port, BTN1_Pin) == GPIO_PIN_RESET)
     { 
       USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, tx_buffer, 64); 
       flag = 0;
+    }
+
+    if(idleLightingConfig.settingChanged == true){
+      idleLightingConfig.settingChanged = false;
+      
+      LP5024_SetColor(LED7, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
+    }
+
+    if(buttonPressLightingConfig.settingChanged == true){
+      idleLightingConfig.settingChanged = false;
+
+      LP5024_SetColor(LED7, Adjust_Color_Brightness(0x00FF00, 20));
     }
     /* USER CODE END WHILE */
 
