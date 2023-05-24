@@ -2,9 +2,13 @@
 #include "main.h"
 #include "LED_Handler.h"
 
+#define CATEGORY_SIZE 14
+
 // Definitions of idle and button press lighting configurations
 LightingConfiguration idleLightingConfig;
 LightingConfiguration buttonPressLightingConfig;
+LightingConfiguration lidLiftLightingConfig;
+bool startupSettingsRecieved = false;
 
 /**
  * @brief Initialize the lighting settings for idle and button press.
@@ -52,6 +56,45 @@ void updateButtonPressLightingConfig(LightingPattern pattern, uint8_t brightness
     buttonPressLightingConfig.frameColor2 = frameColor2;
     buttonPressLightingConfig.buttonColor1 = buttonColor1;
     buttonPressLightingConfig.buttonColor2 = buttonColor2;
+}
+
+/**
+ * @brief Update bulk light settings
+ * 
+ * This function updates the lighting configuration for different lighting modes using the provided report buffer. 
+ * It expects a buffer in a specific format where the first byte is the BULK_SETTINGS_LOAD command 
+ * and the rest are the setting values for each lighting mode, each setting consisting of a specific pattern, 
+ * brightness, pattern speed, frame color 1 and 2, button color 1 and 2. Each category's values are sequentially
+ * ordered in the buffer.
+ * 
+ * The function will update the global lighting configuration variables idleLightingConfig, buttonPressLightingConfig, 
+ * and lidLiftLightingConfig, and will set the settingChanged flag to true to indicate that the settings have been updated.
+ * 
+ * @param report_buffer A pointer to the buffer containing the light settings report
+ * @param buffer_length The length of the report buffer
+ */
+void updateBulkLightSettings(uint8_t *report_buffer, uint16_t buffer_length)
+{
+  // Increment report_buffer pointer by 1 to skip the BULK_SETTINGS_LOAD command report byte
+  report_buffer += 1;
+
+  // Update LightingConfiguration for each lighting mode
+  LightingConfiguration* configs[] = {&idleLightingConfig, &buttonPressLightingConfig, &lidLiftLightingConfig};
+
+  for (int i = 0; i < sizeof(configs)/sizeof(configs[0]); i++) {
+    configs[i]->pattern = report_buffer[0];
+    configs[i]->brightness = report_buffer[1];
+    configs[i]->patternSpeed = report_buffer[2];
+    configs[i]->frameColor1 = (report_buffer[3] << 16) | (report_buffer[4] << 8) | report_buffer[5];
+    configs[i]->frameColor2 = (report_buffer[6] << 16) | (report_buffer[7] << 8) | report_buffer[8];
+    configs[i]->buttonColor1 = (report_buffer[9] << 16) | (report_buffer[10] << 8) | report_buffer[11];
+    configs[i]->buttonColor2 = (report_buffer[12] << 16) | (report_buffer[13] << 8) | report_buffer[14];
+  
+    configs[i]->settingChanged = true;
+
+    // Move to the start of the next category in buffer
+    report_buffer += CATEGORY_SIZE;
+  }
 }
 
 /**

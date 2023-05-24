@@ -34,9 +34,11 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-  #define REPORT_NONE          0x00
-  #define REPORT_IDLE_LIGHT    0x01
-  #define REPORT_BUTTON_LIGHT  0x02
+  #define REPORT_NONE            0x00
+  #define REPORT_IDLE_LIGHT      0x01
+  #define REPORT_BUTTON_LIGHT    0x02
+  #define REPORT_LID_LIFT_LIGHT  0x03
+  #define BULK_SETTINGS_LOAD     0x04
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -123,32 +125,21 @@ int main(void)
       {
         uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
         UpdateLightingConfiguration(&idleLightingConfig, report_buffer[1], theSetting);
-      } 
-
+      }
       else if (report_buffer[0] == REPORT_BUTTON_LIGHT) 
-      { 
-        bool placeholder = 1;
-              //Buf[0]: Change LED
-          //Buf[1]: LED Num
-          //Buf[2]: Brightness
-          //Buf[3]: RED
-          //Buf[4]: GREEN
-          //Buf[5]: BLUE
-
-        //enum LED_Color_Reg led_reg = LedNum_To_ColorReg(report_buffer[1]);
-        // uint32_t color = (report_buffer[3] << 16) | (report_buffer[4] << 8) | report_buffer[5];
-        
-        // uint8_t brightness = report_buffer[2];
-
-        // if(brightness > 100)
-        //   brightness = 100;
-
-        // if(led_reg != LEDERR)
-        //   LP5024_SetColor(led_reg, Adjust_Color_Brightness(color, brightness));
-
-        //Turn the LED7 to GREEN
-        // LP5024_SetColor(LED7, Adjust_Color_Brightness(0x00FF00, 20)); 
-      } 
+      {
+        uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
+        UpdateLightingConfiguration(&buttonPressLightingConfig, report_buffer[1], theSetting); 
+      }
+      else if (report_buffer[0] == REPORT_LID_LIFT_LIGHT)
+      {
+        uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
+        UpdateLightingConfiguration(&lidLiftLightingConfig, report_buffer[1], theSetting); 
+      }
+      else if (report_buffer[0] == BULK_SETTINGS_LOAD)
+      {
+        updateBulkLightSettings(report_buffer, sizeof report_buffer);
+      }
       flag_rx = 0; 
     } 
     //To send the output data when the button is pressed 
@@ -160,14 +151,7 @@ int main(void)
 
     if(idleLightingConfig.settingChanged == true){
       idleLightingConfig.settingChanged = false;
-      
       LP5024_SetColor(LED7, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-    }
-
-    if(buttonPressLightingConfig.settingChanged == true){
-      idleLightingConfig.settingChanged = false;
-
-      LP5024_SetColor(LED7, Adjust_Color_Brightness(0x00FF00, 20));
     }
     /* USER CODE END WHILE */
 

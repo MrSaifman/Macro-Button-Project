@@ -471,14 +471,40 @@ namespace Windows_App_WinUI3
             ColorPickerControl.Visibility = Visibility.Visible;
         }
 
-        private void ColorPickerControl_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
+        private async void ColorPickerControl_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
         {
             if (_currentColorButton != null)
             {
                 _currentColorButton.Background = new SolidColorBrush(sender.Color);
+
+                byte reportValue = GetReportForTag((string)_currentColorButton.Tag);
+
+                // Construct the report data
+                byte[] reportData = new byte[]
+                {
+                    0x01, 0x01, reportValue,
+                    ColorPickerControl.Color.R,
+                    ColorPickerControl.Color.G,
+                    ColorPickerControl.Color.B
+                };
+
+                await deviceManager.ReadWriteToHidDevice(reportData);
+
             }
         }
-        private void ColorPickerControl_LostFocus(object sender, RoutedEventArgs e)
+
+        private byte GetReportForTag(string tag)
+        {
+            switch (tag)
+            {
+                case "FrameColor1": return 0x03;
+                case "FrameColor2": return 0x04;
+                case "ButtonColor1": return 0x05;
+                case "ButtonColor2": return 0x06;
+                default: return 0x00; // Default case if no match
+            }
+        }
+        private async void ColorPickerControl_LostFocus(object sender, RoutedEventArgs e)
         {
             ColorPickerControl.Visibility = Visibility.Collapsed;
             ColorPickerControl.ColorChanged -= ColorPickerControl_ColorChanged;
@@ -511,7 +537,7 @@ namespace Windows_App_WinUI3
             }
         }
 
-        public void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        public async void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (jsonManager == null)
             {
@@ -525,6 +551,30 @@ namespace Windows_App_WinUI3
 
             jsonManager.LightUpPattern = selectedPattern;
             jsonManager.UpdateSetting(jsonManager.currentLightingMode, "LightUpPattern", selectedPattern);
+
+            byte patternValue = ConvertPatternToByte(selectedPattern);
+
+            byte[] reportData = new byte[]
+            {
+                0x01, 0x01, 0x00, 0x00, 0x00, patternValue
+            };
+
+            await deviceManager.ReadWriteToHidDevice(reportData);
+        }
+
+        private byte ConvertPatternToByte(string pattern)
+        {
+            switch (pattern)
+            {
+                case "None": return 0;
+                case "Static": return 1;
+                case "Wipe": return 2;
+                case "Ease In": return 3;
+                case "Ease Between": return 4;
+                case "Blink Between": return 5;
+                case "Rainbow Cycle": return 6;
+                default: return 0; // Default case if no match
+            }
         }
 
         public async void Slider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
@@ -542,10 +592,26 @@ namespace Windows_App_WinUI3
 
             jsonManager.UpdateSetting(jsonManager.currentLightingMode, settingName, value.ToString());
 
-            byte[] reportData = new byte[]
+            byte[] reportData;
+            if (settingName == "Brightness")
             {
-                0x01, 0x01, 0x02, 0x00, 0x00, Convert.ToByte(value)
-            };
+                reportData = new byte[]
+                {
+                    0x01, 0x01, 0x02, 0x00, 0x00, Convert.ToByte(value)
+                };
+            }
+            else if (settingName == "PatternSpeed")
+            {
+                reportData = new byte[]
+                {
+                    0x01, 0x01, 0x01, 0x00, 0x00, Convert.ToByte(value)
+                };
+            }
+            else
+            {
+                // Unknown slider setting. Do nothing or handle error appropriately.
+                return;
+            }
 
             await deviceManager.ReadWriteToHidDevice(reportData);
         }
