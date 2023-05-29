@@ -24,6 +24,7 @@ namespace Windows_App_WinUI3
         private HidDevice device;
         
         public event EventHandler<byte[]> DataReceived;
+        private DeviceWatcher deviceWatcher;
 
         public async Task InitializeDeviceAsync()
         {
@@ -40,6 +41,8 @@ namespace Windows_App_WinUI3
                     device.InputReportReceived += Device_InputReportReceived;
                 }
             }
+            
+            StartDeviceWatcher();
         }
 
         private void Device_InputReportReceived(HidDevice sender, HidInputReportReceivedEventArgs args)
@@ -92,6 +95,45 @@ namespace Windows_App_WinUI3
 
             // Log the data string or show it in your UI, etc...
             Debug.WriteLine("Data received: " + dataString);
+        }
+
+        private void StartDeviceWatcher()
+        {
+            string selector = HidDevice.GetDeviceSelector(usagePage, usageId, vendorId, productId);
+            deviceWatcher = DeviceInformation.CreateWatcher(selector);
+
+            deviceWatcher.Added += DeviceWatcher_Added;
+            deviceWatcher.Removed += DeviceWatcher_Removed;
+
+            deviceWatcher.Start();
+        }
+
+        private void StopDeviceWatcher()
+        {
+            if (deviceWatcher.Status == DeviceWatcherStatus.Started)
+            {
+                deviceWatcher.Stop();
+            }
+
+            deviceWatcher.Added -= DeviceWatcher_Added;
+            deviceWatcher.Removed -= DeviceWatcher_Removed;
+        }
+
+        private async void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation deviceInfo)
+        {
+            if (device == null) // Check if device is already initialized
+            {
+                await InitializeDeviceAsync();
+            }
+        }
+
+        private void DeviceWatcher_Removed(DeviceWatcher sender, DeviceInformationUpdate deviceInfoUpdate)
+        {
+            if (device != null)
+            {
+                device.Dispose();
+                device = null;
+            }
         }
 
     }
