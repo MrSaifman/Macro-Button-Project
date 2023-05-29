@@ -59,6 +59,9 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define MCO_Pin GPIO_PIN_0
 #define MCO_GPIO_Port GPIOF
+#define BTN1_Pin GPIO_PIN_0
+#define BTN1_GPIO_Port GPIOA
+#define BTN1_EXTI_IRQn EXTI0_1_IRQn
 #define USART2_TX_Pin GPIO_PIN_2
 #define USART2_TX_GPIO_Port GPIOA
 #define USART2_RX_Pin GPIO_PIN_3
@@ -69,8 +72,6 @@ void Error_Handler(void);
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
-#define BTN1_Pin GPIO_PIN_3
-#define BTN1_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
