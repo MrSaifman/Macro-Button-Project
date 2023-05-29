@@ -12,6 +12,8 @@ namespace Windows_App_WinUI3
 {
     public class USBDeviceManager
     {
+        private CloseHandler closeHandler = new CloseHandler();
+
         // Define your device VID and PID.
         private ushort vendorId = 1155;  // USBD_VID
         private ushort productId = 22555; // USBD_PID
@@ -95,6 +97,8 @@ namespace Windows_App_WinUI3
 
             // Log the data string or show it in your UI, etc...
             Debug.WriteLine("Data received: " + dataString);
+            closeHandler = new CloseHandler();
+            closeHandler.PrintActiveWindow();
         }
 
         private void StartDeviceWatcher()

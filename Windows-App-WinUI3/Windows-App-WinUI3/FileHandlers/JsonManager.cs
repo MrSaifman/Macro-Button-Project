@@ -39,37 +39,40 @@ namespace Windows_App_WinUI3.FileHandlers
                 // Define your default settings here
                 string defaultSettingsJson =
                 "{" +
-                  "'Settings': {" +
-                    "'LightingSettings': {" +
-                      "'IdleLighting': {" +
-                        "'LightUpPattern': 'None'," +
-                        "'Brightness': 50," +
-                        "'PatternSpeed': 50," +
-                        "'FrameColor1': '#FFFFFFFF'," +
-                        "'FrameColor2': '#FFFFFFFF'," +
-                        "'ButtonColor1': '#FFFFFFFF'," +
-                        "'ButtonColor2': '#FFFFFFFF'" +
-                      "}," +
-                      "'ButtonPressLighting': {" +
-                        "'LightUpPattern': 'None'," +
-                        "'Brightness': 50," +
-                        "'PatternSpeed': 50," +
-                        "'FrameColor1': '#FFFFFFFF'," +
-                        "'FrameColor2': '#FFFFFFFF'," +
-                        "'ButtonColor1': '#FFFFFFFF'," +
-                        "'ButtonColor2': '#FFFFFFFF'" +
-                      "}," +
-                      "'LidLiftLighting': {" +
-                        "'LightUpPattern': 'None'," +
-                        "'Brightness': 50," +
-                        "'PatternSpeed': 50," +
-                        "'FrameColor1': '#FFFFFFFF'," +
-                        "'FrameColor2': '#FFFFFFFF'," +
-                        "'ButtonColor1': '#FFFFFFFF'," +
-                        "'ButtonColor2': '#FFFFFFFF'" +
-                      "}" +
+                    "'Settings': {" +
+                        "'LightingSettings': {" +
+                            "'IdleLighting': {" +
+                                "'LightUpPattern': 'None'," +
+                                "'Brightness': 50," +
+                                "'PatternSpeed': 50," +
+                                "'FrameColor1': '#FFFFFFFF'," +
+                                "'FrameColor2': '#FFFFFFFF'," +
+                                "'ButtonColor1': '#FFFFFFFF'," +
+                                "'ButtonColor2': '#FFFFFFFF'" +
+                            "}," +
+                            "'ButtonPressLighting': {" +
+                                "'LightUpPattern': 'None'," +
+                                "'Brightness': 50," +
+                                "'PatternSpeed': 50," +
+                                "'FrameColor1': '#FFFFFFFF'," +
+                                "'FrameColor2': '#FFFFFFFF'," +
+                                "'ButtonColor1': '#FFFFFFFF'," +
+                                "'ButtonColor2': '#FFFFFFFF'" +
+                            "}," +
+                            "'LidLiftLighting': {" +
+                                "'LightUpPattern': 'None'," +
+                                "'Brightness': 50," +
+                                "'PatternSpeed': 50," +
+                                "'FrameColor1': '#FFFFFFFF'," +
+                                "'FrameColor2': '#FFFFFFFF'," +
+                                "'ButtonColor1': '#FFFFFFFF'," +
+                                "'ButtonColor2': '#FFFFFFFF'" +
+                            "}" +
+                        "}," +
+                        "'AppSettings': {" +
+                            "'FocusedAppOnly': true" +
+                        "}" +
                     "}" +
-                  "}" +
                 "}";
 
                 // Write the default settings to the file
@@ -123,6 +126,23 @@ namespace Windows_App_WinUI3.FileHandlers
 
                     settings["LightingSettings"] = lightingSettings;
                 }
+                 // Handle the 'AppSettings' category.
+                if (category == "AppSettings")
+                {
+                    if (settings.ContainsKey("AppSettings"))
+                    {
+                        var appSettings = JsonSerializer.Deserialize<Dictionary<string, object>>(settings["AppSettings"].ToString());
+
+                        if (appSettings.ContainsKey(setting))
+                        {
+                            appSettings[setting] = value;
+                            settings["AppSettings"] = appSettings;
+                        }
+                    }
+
+                    settingsDict["Settings"] = settings;
+                }
+
 
                 settingsDict["Settings"] = settings;
             }
@@ -173,6 +193,16 @@ namespace Windows_App_WinUI3.FileHandlers
                         {
                             return categorySettings[setting].ToString();
                         }
+                    }
+                }
+                
+                if (category == "AppSettings" && settings.ContainsKey("AppSettings"))
+                {
+                    var appSettings = JsonSerializer.Deserialize<Dictionary<string, object>>(settings["AppSettings"].ToString());
+
+                    if (appSettings.ContainsKey(setting))
+                    {
+                        return appSettings[setting].ToString();
                     }
                 }
             }

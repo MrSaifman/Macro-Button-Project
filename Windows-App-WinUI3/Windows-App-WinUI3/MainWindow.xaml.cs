@@ -58,6 +58,10 @@ namespace Windows_App_WinUI3
             PopulateBlackAndWhiteLists();
             PopulateLightSettings("IdleLighting");
 
+            string focusedAppOnlySetting = jsonManager.ReadSetting("AppSettings", "FocusedAppOnly");
+            GreetingToggleSwitch.IsOn = focusedAppOnlySetting == "True";
+            GreetingToggleSwitch_Toggled(null, null);
+
             InitializeDevice();
 
         }
@@ -140,12 +144,15 @@ namespace Windows_App_WinUI3
         {
             if (GreetingToggleSwitch.IsOn)
             {
-                GreetingTextBlock.Text = "Disable Current Application Close";
+                GreetingTextBlock.Text = "Only closes the focused app";
             }
             else
             {
-                GreetingTextBlock.Text = "Enable Current Application Close";
+                GreetingTextBlock.Text = "Closes applications based on whitelist";
             }
+
+            // Update the JSON when the switch is toggled.
+            jsonManager.UpdateSetting("AppSettings", "FocusedAppOnly", GreetingToggleSwitch.IsOn.ToString());
         }
 
         private void NavButton_PointerEntered(object sender, PointerRoutedEventArgs e)
