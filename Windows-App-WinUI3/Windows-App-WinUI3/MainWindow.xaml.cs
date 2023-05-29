@@ -309,6 +309,45 @@ namespace Windows_App_WinUI3
             }
         }
 
+        private void ProcessKeyForRunningPrograms(ObservableCollection<Program> programs)
+        {
+            foreach (var process in Process.GetProcesses())
+            {
+                try
+                {
+                    if (!string.IsNullOrEmpty(process.MainWindowTitle))
+                    {
+                        string name = process.ProcessName;
+                        string appPath = process.MainModule.FileName;
+
+                        // Create a new Program object with the name and path of the running program
+                        programs.Add(new Program { Name = name, Path = appPath });
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private void InstalledProgramsButton_Click(object sender, RoutedEventArgs e)
+        {
+            ObservableCollection<Program> programs = new ObservableCollection<Program>();
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
+            {
+                ProcessKeyForPrograms(key, programs);
+            }
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
+            {
+                ProcessKeyForPrograms(key, programs);
+            }
+            ProgramsListBox.ItemsSource = programs;
+        }
+        private void ActiveProgramsButton_Click(object sender, RoutedEventArgs e)
+        {
+            ObservableCollection<Program> programs = new ObservableCollection<Program>();
+            ProcessKeyForRunningPrograms(programs);
+            ProgramsListBox.ItemsSource = programs;
+        }
+
         private void AddToBlacklist_Click(object sender, RoutedEventArgs e)
         {
             Program selectedProgram = ProgramsListBox.SelectedItem as Program;

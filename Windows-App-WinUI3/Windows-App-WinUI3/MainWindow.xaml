@@ -162,9 +162,20 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
+                                <Button Grid.Column="0" Content="Installed Programs" HorizontalAlignment="Stretch" Background="Black" CornerRadius="16" Width="200" Click="InstalledProgramsButton_Click"/>
+                                <Button Grid.Column="1" Content="Active Programs" HorizontalAlignment="Stretch" Background="Black" CornerRadius="16" Width="200" Click="ActiveProgramsButton_Click"/>
+                                <Button Grid.Column="2" Content="Browse" HorizontalAlignment="Stretch" Background="Black" CornerRadius="16" Width="200"/>
+
+                            </Grid>
+
+                            <Grid Grid.Row="3" Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
                                 <Button Grid.Column="0" Content="Add To Blacklist" HorizontalAlignment="Stretch" Background="Black" CornerRadius="16" Width="200" Click="AddToBlacklist_Click"/>
                                 <Button Grid.Column="1" Content="Add To Whitelist" HorizontalAlignment="Stretch" Background="Black" CornerRadius="16" Width="200" Click="AddToWhitelist_Click"/>
-                                <Button Grid.Column="2" Content="Browse" HorizontalAlignment="Stretch" Background="Black" CornerRadius="16" Width="200"/>
 
                             </Grid>
                             
