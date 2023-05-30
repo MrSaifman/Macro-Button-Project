@@ -2,6 +2,19 @@
   "version": 3,
   "targets": {
     "net7.0-windows10.0.19041": {
+      "IconExtractor/1.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/IconExtractor.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/IconExtractor.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.Windows.SDK.BuildTools/10.0.22621.755": {
         "type": "package",
         "build": {
@@ -95,6 +108,19 @@
       }
     },
     "net7.0-windows10.0.19041/win10-arm64": {
+      "IconExtractor/1.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/IconExtractor.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/IconExtractor.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.Windows.SDK.BuildTools/10.0.22621.755": {
         "type": "package",
         "build": {
@@ -177,6 +203,19 @@
       }
     },
     "net7.0-windows10.0.19041/win10-x64": {
+      "IconExtractor/1.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/IconExtractor.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/IconExtractor.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.Windows.SDK.BuildTools/10.0.22621.755": {
         "type": "package",
         "build": {
@@ -259,6 +298,19 @@
       }
     },
     "net7.0-windows10.0.19041/win10-x86": {
+      "IconExtractor/1.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/IconExtractor.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/IconExtractor.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.Windows.SDK.BuildTools/10.0.22621.755": {
         "type": "package",
         "build": {
@@ -342,6 +394,22 @@
     }
   },
   "libraries": {
+    "IconExtractor/1.0.1": {
+      "sha512": "CdNcIOMZd3vze9bEFuH+ngAn9L3tMhhlTiVHLoh8vS2V/+nlgQLRQ/dhipl1HRRf6qVtXyLB+R/rPRxzHeRGuQ==",
+      "type": "package",
+      "path": "iconextractor/1.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "iconextractor.1.0.1.nupkg.sha512",
+        "iconextractor.nuspec",
+        "lib/net40/IconExtractor.dll",
+        "lib/net40/IconExtractor.xml",
+        "lib/netstandard2.0/IconExtractor.dll",
+        "lib/netstandard2.0/IconExtractor.xml",
+        "nupkg-icon.png"
+      ]
+    },
     "Microsoft.Windows.SDK.BuildTools/10.0.22621.755": {
       "sha512": "zGXDCZc2/slVjpNtopNETCjnOqH9KiEdo9dPCcjtNWwK5W+EmOcEn7X5Ftj3tOE9kLvroga1s7WwLh2a5jQEEg==",
       "type": "package",
@@ -1176,6 +1244,7 @@
   },
   "projectFileDependencyGroups": {
     "net7.0-windows10.0.19041": [
+      "IconExtractor >= 1.0.1",
       "Microsoft.Windows.SDK.BuildTools >= 10.0.22621.755",
       "Microsoft.WindowsAppSDK >= 1.2.221109.1"
     ]
@@ -1225,6 +1294,10 @@
       "net7.0-windows10.0.19041": {
         "targetAlias": "net7.0-windows10.0.19041.0",
         "dependencies": {
+          "IconExtractor": {
+            "target": "Package",
+            "version": "[1.0.1, )"
+          },
           "Microsoft.Windows.SDK.BuildTools": {
             "target": "Package",
             "version": "[10.0.22621.755, )"

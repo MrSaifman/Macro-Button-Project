@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "ipF38m/jFpo6hLxMMZQn/Nrn/oB3S/I+IBHTzmd8j7r+hjyg1d9fPPd+Rh0MHjNjiG5fNx5L3+J9Ns/9BI6ehg==",
+  "dgSpecHash": "+jO8v6yxrIlp1PAc27+328p5Tw5Z9BC+D3D6HNXlWEVdUm0bLAxn/ocXTLWICnC46Wa0oIdQ5qMtB3rUqo0sMg==",
   "success": true,
   "projectFilePath": "F:\\Rage-Quit-Button-Project\\Windows-App-WinUI3\\Windows-App-WinUI3\\Windows-App-WinUI3.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\caseh\\.nuget\\packages\\iconextractor\\1.0.1\\iconextractor.1.0.1.nupkg.sha512",
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages\\microsoft.windows.sdk.buildtools\\10.0.22621.755\\microsoft.windows.sdk.buildtools.10.0.22621.755.nupkg.sha512",
     "C:\\Users\\caseh\\.nuget\\packages\\microsoft.windowsappsdk\\1.2.221109.1\\microsoft.windowsappsdk.1.2.221109.1.nupkg.sha512",
     "C:\\Users\\caseh\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x86\\7.0.5\\microsoft.netcore.app.runtime.win-x86.7.0.5.nupkg.sha512",

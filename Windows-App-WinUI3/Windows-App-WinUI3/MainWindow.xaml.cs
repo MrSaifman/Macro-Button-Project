@@ -28,6 +28,7 @@ using System.Text.Json;
 
 using Windows_App_WinUI3.FileHandlers;
 using System.Drawing;
+using System.IO.Pipes;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -275,8 +276,18 @@ namespace Windows_App_WinUI3
             ProgramsListBox.ItemsSource = programs;
         }
 
-        private void ProcessKeyForPrograms(RegistryKey key, ObservableCollection<Program> programs, string searchTerm = null)
+        private async void ProcessKeyForPrograms(RegistryKey key, ObservableCollection<Program> programs, string searchTerm = null)
         {
+            string projectDirectory = Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory));
+            string dataDirectory = Path.Combine(projectDirectory, "Data");
+            string tempDirectory = Path.Combine(dataDirectory, "TempIcons");
+
+            // Create the TempIcons directory if it doesn't exist
+            if (!Directory.Exists(tempDirectory))
+            {
+                Directory.CreateDirectory(tempDirectory);
+            }
+
             foreach (string subKeyName in key.GetSubKeyNames())
             {
                 using (RegistryKey subKey = key.OpenSubKey(subKeyName))
@@ -299,7 +310,24 @@ namespace Windows_App_WinUI3
                             BitmapImage icon = null;
                             if (!string.IsNullOrEmpty(iconPath))
                             {
-                                icon = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
+                                if (Path.GetExtension(iconPath).ToLower() == ".exe")
+                                {
+                                    // Create a temporary .ico file in the TempIcons directory
+                                    var tempIconPath = Path.Combine(tempDirectory, Path.GetRandomFileName() + ".ico");
+
+                                    // Extract the icon from the exe and save it into the temporary .ico file
+                                    using (var fileStream = File.Create(tempIconPath))
+                                    {
+                                        Toolbelt.Drawing.IconExtractor.Extract1stIconTo(iconPath, fileStream);
+                                    }
+
+                                    // Create a BitmapImage from the .ico file
+                                    icon = new BitmapImage(new Uri(tempIconPath, UriKind.Absolute));
+                                }
+                                else
+                                {
+                                    icon = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
+                                }
                             }
                             programs.Add(new Program { Name = name, Icon = icon, Path = appPath });
                         }
@@ -308,6 +336,17 @@ namespace Windows_App_WinUI3
                 }
             }
         }
+
+        //Used to remove the temp folder when its done. Need to implement this
+        //DeleteTempIcons(tempDirectory);
+        public void DeleteTempIcons(string tempDirectory)
+        {
+            if (Directory.Exists(tempDirectory))
+            {
+                Directory.Delete(tempDirectory, true);
+            }
+        }
+
 
         private void ProcessKeyForRunningPrograms(ObservableCollection<Program> programs)
         {
