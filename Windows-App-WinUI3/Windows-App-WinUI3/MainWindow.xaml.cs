@@ -278,7 +278,7 @@ namespace Windows_App_WinUI3
 
         private async void ProcessKeyForPrograms(RegistryKey key, ObservableCollection<Program> programs, string searchTerm = null)
         {
-            string projectDirectory = Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory));
+            string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
             string dataDirectory = Path.Combine(projectDirectory, "Data");
             string tempDirectory = Path.Combine(dataDirectory, "TempIcons");
 
@@ -312,13 +312,18 @@ namespace Windows_App_WinUI3
                             {
                                 if (Path.GetExtension(iconPath).ToLower() == ".exe")
                                 {
-                                    // Create a temporary .ico file in the TempIcons directory
-                                    var tempIconPath = Path.Combine(tempDirectory, Path.GetRandomFileName() + ".ico");
+                                    string iconFileName = name.Replace(" ", "_") + ".ico"; // Generate a file name based on the program name
+                                    string tempIconPath = Path.Combine(tempDirectory, iconFileName);
 
-                                    // Extract the icon from the exe and save it into the temporary .ico file
-                                    using (var fileStream = File.Create(tempIconPath))
+                                    // Check if an icon for this program already exists
+                                    if (!File.Exists(tempIconPath))
                                     {
-                                        Toolbelt.Drawing.IconExtractor.Extract1stIconTo(iconPath, fileStream);
+                                        // If not, create a new icon
+                                        // Extract the icon from the exe and save it into the temporary .ico file
+                                        using (var fileStream = File.Create(tempIconPath))
+                                        {
+                                            Toolbelt.Drawing.IconExtractor.Extract1stIconTo(iconPath, fileStream);
+                                        }
                                     }
 
                                     // Create a BitmapImage from the .ico file
@@ -326,6 +331,7 @@ namespace Windows_App_WinUI3
                                 }
                                 else
                                 {
+                                    // If the icon is not an .exe file, use the original icon path
                                     icon = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
                                 }
                             }
@@ -336,6 +342,7 @@ namespace Windows_App_WinUI3
                 }
             }
         }
+
 
         //Used to remove the temp folder when its done. Need to implement this
         //DeleteTempIcons(tempDirectory);
