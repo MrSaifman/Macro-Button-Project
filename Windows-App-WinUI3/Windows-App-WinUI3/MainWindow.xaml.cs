@@ -300,6 +300,12 @@ namespace Windows_App_WinUI3
 
                         if (!string.IsNullOrEmpty(name) && (searchTerm == null || name.ToLowerInvariant().Contains(searchTerm)))
                         {
+                            // Check if the icon path has a ",0" at the end and remove it
+                            if (iconPath != null && iconPath.EndsWith(",0"))
+                            {
+                                iconPath = iconPath.Remove(iconPath.Length - 2);
+                            }
+
                             // Try to resolve the icon file path
                             if (!string.IsNullOrEmpty(iconPath))
                             {
@@ -342,6 +348,7 @@ namespace Windows_App_WinUI3
                 }
             }
         }
+
 
 
         //Used to remove the temp folder when its done. Need to implement this
