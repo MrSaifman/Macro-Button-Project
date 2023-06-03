@@ -40,20 +40,15 @@ namespace Windows_App_WinUI3
     /// </summary>
     public sealed partial class MainWindow : Window
     {
-
         private JsonManager jsonManager;
         private USBDeviceManager deviceManager;
+        private Button _selectedButton;
+        private Button _currentColorButton;
 
         public MainWindow()
         {
             this.InitializeComponent();
-
-            deviceManager = new USBDeviceManager();
-            deviceManager.DataReceived += deviceManager.DeviceManager_DataReceived; // Subscribe to the event here
-
-            jsonManager = new JsonManager();
-            jsonManager.EnsureDefaultSettingsExist();
-            jsonManager.currentLightingMode = "IdleLighting";
+            InitializeManagers();
             
             PopulateProgramsListBox();
             PopulateBlackAndWhiteLists();
@@ -67,13 +62,20 @@ namespace Windows_App_WinUI3
 
         }
 
+        private void InitializeManagers()
+        {
+            deviceManager = new USBDeviceManager();
+            deviceManager.DataReceived += deviceManager.DeviceManager_DataReceived; // Subscribe to the event here
+
+            jsonManager = new JsonManager();
+            jsonManager.EnsureDefaultSettingsExist();
+            jsonManager.currentLightingMode = "IdleLighting";
+        }
+
         private async void InitializeDevice()
         {
             await deviceManager.InitializeDeviceAsync();
         }
-
-        private Button _selectedButton;
-        private Button _currentColorButton;
 
         private void NavButton_Click(object sender, RoutedEventArgs e)
         {
@@ -180,7 +182,7 @@ namespace Windows_App_WinUI3
 
         private async void PopulateProgramsListBox()
         {
-            ObservableCollection<Program> programs = new ObservableCollection<Program>();
+            ObservableCollection<AppInformation> programs = new ObservableCollection<AppInformation>();
 
             // Define the uninstall keys
             string[] uninstallKeys =
@@ -213,36 +215,13 @@ namespace Windows_App_WinUI3
             ProgramsListBox.ItemsSource = programs;
         }
 
-        public class Program
-        {
-            public string Name { get; set; }
-            public BitmapImage Icon { get; set; }
-            public string Path { get; set; }
-
-            public override bool Equals(object obj)
-            {
-                if (obj == null || GetType() != obj.GetType())
-                {
-                    return false;
-                }
-
-                var program = (Program)obj;
-                return Name == program.Name && Icon.UriSource == program.Icon.UriSource && Path == program.Path;
-            }
-
-            // override object.GetHashCode
-            public override int GetHashCode()
-            {
-                return HashCode.Combine(Name, Icon.UriSource, Path);
-            }
-        }
 
         private async void SearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             // Get the search term from the AutoSuggestBox
             string searchTerm = sender.Text.ToLowerInvariant();
 
-            ObservableCollection<Program> programs = new ObservableCollection<Program>();
+            ObservableCollection<AppInformation> programs = new ObservableCollection<AppInformation>();
 
             // Define the uninstall keys
             string[] uninstallKeys =
@@ -276,7 +255,7 @@ namespace Windows_App_WinUI3
             ProgramsListBox.ItemsSource = programs;
         }
 
-        private async void ProcessKeyForPrograms(RegistryKey key, ObservableCollection<Program> programs, string searchTerm = null)
+        private async void ProcessKeyForPrograms(RegistryKey key, ObservableCollection<AppInformation> programs, string searchTerm = null)
         {
             string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
             string dataDirectory = Path.Combine(projectDirectory, "Data");
@@ -341,7 +320,7 @@ namespace Windows_App_WinUI3
                                     icon = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
                                 }
                             }
-                            programs.Add(new Program { Name = name, Icon = icon, Path = appPath });
+                            programs.Add(new AppInformation { Name = name, Icon = icon, Path = appPath });
                         }
                     }
                     catch { }
@@ -362,7 +341,7 @@ namespace Windows_App_WinUI3
         }
 
 
-        private void ProcessKeyForRunningPrograms(ObservableCollection<Program> programs)
+        private void ProcessKeyForRunningPrograms(ObservableCollection<AppInformation> programs)
         {
             foreach (var process in Process.GetProcesses())
             {
@@ -374,7 +353,7 @@ namespace Windows_App_WinUI3
                         string appPath = process.MainModule.FileName;
 
                         // Create a new Program object with the name and path of the running program
-                        programs.Add(new Program { Name = name, Path = appPath });
+                        programs.Add(new AppInformation { Name = name, Path = appPath });
                     }
                 }
                 catch { }
@@ -383,7 +362,7 @@ namespace Windows_App_WinUI3
 
         private void InstalledProgramsButton_Click(object sender, RoutedEventArgs e)
         {
-            ObservableCollection<Program> programs = new ObservableCollection<Program>();
+            ObservableCollection<AppInformation> programs = new ObservableCollection<AppInformation>();
             using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
             {
                 ProcessKeyForPrograms(key, programs);
@@ -396,14 +375,14 @@ namespace Windows_App_WinUI3
         }
         private void ActiveProgramsButton_Click(object sender, RoutedEventArgs e)
         {
-            ObservableCollection<Program> programs = new ObservableCollection<Program>();
+            ObservableCollection<AppInformation> programs = new ObservableCollection<AppInformation>();
             ProcessKeyForRunningPrograms(programs);
             ProgramsListBox.ItemsSource = programs;
         }
 
         private void AddToBlacklist_Click(object sender, RoutedEventArgs e)
         {
-            Program selectedProgram = ProgramsListBox.SelectedItem as Program;
+            AppInformation selectedProgram = ProgramsListBox.SelectedItem as AppInformation;
             if (selectedProgram != null)
             {
                 string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
@@ -413,18 +392,18 @@ namespace Windows_App_WinUI3
                 // Ensure the Data directory exists
                 Directory.CreateDirectory(dataDirectory);
 
-                ObservableCollection<Program> blacklist;
+                ObservableCollection<AppInformation> blacklist;
 
                 // Read the existing blacklist file if it exists
                 if (File.Exists(blacklistFilePath))
                 {
                     string jsonString = File.ReadAllText(blacklistFilePath);
-                    blacklist = JsonSerializer.Deserialize<ObservableCollection<Program>>(jsonString);
+                    blacklist = JsonSerializer.Deserialize<ObservableCollection<AppInformation>>(jsonString);
                 }
                 else
                 {
                     // If it doesn't exist, create a new list
-                    blacklist = new ObservableCollection<Program>();
+                    blacklist = new ObservableCollection<AppInformation>();
                 }
 
                 // Add the selected program to the list
@@ -445,7 +424,7 @@ namespace Windows_App_WinUI3
 
         private void AddToWhitelist_Click(object sender, RoutedEventArgs e)
         {
-            Program selectedProgram = ProgramsListBox.SelectedItem as Program;
+            AppInformation selectedProgram = ProgramsListBox.SelectedItem as AppInformation;
             if (selectedProgram != null)
             {
                 string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
@@ -455,18 +434,18 @@ namespace Windows_App_WinUI3
                 // Ensure the Data directory exists
                 Directory.CreateDirectory(dataDirectory);
 
-                ObservableCollection<Program> whitelist;
+                ObservableCollection<AppInformation> whitelist;
 
                 // Read the existing whitelist file if it exists
                 if (File.Exists(whitelistFilePath))
                 {
                     string jsonString = File.ReadAllText(whitelistFilePath);
-                    whitelist = JsonSerializer.Deserialize<ObservableCollection<Program>>(jsonString);
+                    whitelist = JsonSerializer.Deserialize<ObservableCollection<AppInformation>>(jsonString);
                 }
                 else
                 {
                     // If it doesn't exist, create a new list
-                    whitelist = new ObservableCollection<Program>();
+                    whitelist = new ObservableCollection<AppInformation>();
                 }
 
                 // Add the selected program to the list
@@ -498,13 +477,13 @@ namespace Windows_App_WinUI3
             if (File.Exists(blacklistFilePath))
             {
                 string jsonString = File.ReadAllText(blacklistFilePath);
-                BlackListBox.ItemsSource = JsonSerializer.Deserialize<ObservableCollection<Program>>(jsonString);
+                BlackListBox.ItemsSource = JsonSerializer.Deserialize<ObservableCollection<AppInformation>>(jsonString);
             }
 
             if (File.Exists(whitelistFilePath))
             {
                 string jsonString = File.ReadAllText(whitelistFilePath);
-                WhiteListBox.ItemsSource = JsonSerializer.Deserialize<ObservableCollection<Program>>(jsonString);
+                WhiteListBox.ItemsSource = JsonSerializer.Deserialize<ObservableCollection<AppInformation>>(jsonString);
             }
         }
 
@@ -515,13 +494,13 @@ namespace Windows_App_WinUI3
             string whitelistFilePath = Path.Combine(dataDirectory, "whitelist.json");
 
             // Get the selected program
-            Program selectedProgram = (Program)WhiteListBox.SelectedItem;
+            AppInformation selectedProgram = (AppInformation)WhiteListBox.SelectedItem;
 
             if (selectedProgram != null)
             {
                 // Load the current whitelist
                 string jsonString = File.ReadAllText(whitelistFilePath);
-                List<Program> whitelist = JsonSerializer.Deserialize<List<Program>>(jsonString);
+                List<AppInformation> whitelist = JsonSerializer.Deserialize<List<AppInformation>>(jsonString);
 
                 // Remove the selected program
                 whitelist.RemoveAll(p => p.Name == selectedProgram.Name);
@@ -542,13 +521,13 @@ namespace Windows_App_WinUI3
             string blacklistFilePath = Path.Combine(dataDirectory, "blacklist.json");
 
             // Get the selected program
-            Program selectedProgram = (Program)BlackListBox.SelectedItem;
+            AppInformation selectedProgram = (AppInformation)BlackListBox.SelectedItem;
 
             if (selectedProgram != null)
             {
                 // Load the current blacklist
                 string jsonString = File.ReadAllText(blacklistFilePath);
-                List<Program> blacklist = JsonSerializer.Deserialize<List<Program>>(jsonString);
+                List<AppInformation> blacklist = JsonSerializer.Deserialize<List<AppInformation>>(jsonString);
 
                 // Remove the selected program
                 blacklist.RemoveAll(p => p.Name == selectedProgram.Name);
