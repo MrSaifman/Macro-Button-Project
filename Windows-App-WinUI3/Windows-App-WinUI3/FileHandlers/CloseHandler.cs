@@ -30,12 +30,12 @@ namespace Windows_App_WinUI3
                 return;
             }
 
-            activeWindow = activeWindow.ToLower();
+            activeWindow = activeWindow.ToLower().Replace(" ", "");
             JsonManager jsonManager = new JsonManager();
             List<Application> blacklist = jsonManager.ReadApplicationList("blacklist.json");
             List<Application> whitelist = jsonManager.ReadApplicationList("whitelist.json");
 
-            if (blacklist.Any(app => activeWindow.Contains(app.Name.ToLower()) || app.Name.ToLower().Contains(activeWindow)))
+            if (blacklist.Any(app => activeWindow.Contains(app.Name.ToLower().Replace(" ", "")) || app.Name.ToLower().Replace(" ", "").Contains(activeWindow)))
             {
                 Debug.WriteLine("Active window is in the blacklist");
             }
@@ -44,7 +44,7 @@ namespace Windows_App_WinUI3
                 Debug.WriteLine("Active window is not in the blacklist");
             }
 
-            if (whitelist.Any(app => activeWindow.Contains(app.Name.ToLower()) || app.Name.ToLower().Contains(activeWindow)))
+            if (whitelist.Any(app => activeWindow.Contains(app.Name.ToLower().Replace(" ", "")) || app.Name.ToLower().Replace(" ", "").Contains(activeWindow)))
             {
                 Debug.WriteLine("Active window is in the whitelist");
             }
