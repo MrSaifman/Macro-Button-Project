@@ -98,7 +98,7 @@ namespace Windows_App_WinUI3
             // Log the data string or show it in your UI, etc...
             Debug.WriteLine("Data received: " + dataString);
             closeHandler = new CloseHandler();
-            closeHandler.ForceCloseActiveWindow();
+            closeHandler.PrintActiveWindow();
         }
 
         private void StartDeviceWatcher()

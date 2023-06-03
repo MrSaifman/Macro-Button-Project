@@ -210,6 +210,47 @@ namespace Windows_App_WinUI3.FileHandlers
             return null;
         }
 
+        public List<Application> ReadApplicationList(string fileName)
+        {
+            string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+            string dataDirectory = Path.Combine(projectDirectory, "Data");
+            string appsFilePath = Path.Combine(dataDirectory, fileName);
 
+            string jsonString = File.ReadAllText(appsFilePath);
+
+            if (string.IsNullOrEmpty(jsonString))
+            {
+                return null;
+            }
+
+            return JsonSerializer.Deserialize<List<Application>>(jsonString);
+        }
     }
+    public class Icon
+    {
+        public bool AutoPlay { get; set; }
+        public int CreateOptions { get; set; }
+        public int DecodePixelHeight { get; set; }
+        public int DecodePixelType { get; set; }
+        public int DecodePixelWidth { get; set; }
+        public bool IsAnimatedBitmap { get; set; }
+        public bool IsPlaying { get; set; }
+        public string UriSource { get; set; }
+        public int PixelHeight { get; set; }
+        public int PixelWidth { get; set; }
+        public DispatcherQueue DispatcherQueue { get; set; }
+    }
+
+    public class DispatcherQueue
+    {
+        public bool HasThreadAccess { get; set; }
+    }
+
+    public class Application
+    {
+        public string Name { get; set; }
+        public Icon Icon { get; set; }
+        public string Path { get; set; }
+    }
+
 }

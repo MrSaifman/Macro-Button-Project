@@ -4,6 +4,9 @@ using Windows_App_WinUI3;
 using System.Text;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using Windows_App_WinUI3.FileHandlers;
+using System.Linq;
 
 namespace Windows_App_WinUI3
 {
@@ -20,15 +23,39 @@ namespace Windows_App_WinUI3
 
         public void PrintActiveWindow()
         {
-            const int nChars = 256;
-            StringBuilder Buff = new StringBuilder(nChars);
-            IntPtr handle = GetForegroundWindow();
-
-            if (GetWindowText(handle, Buff, nChars) > 0)
+            string activeWindow = GetActiveWindow();
+            if (activeWindow == null)
             {
-                Debug.WriteLine("Active Window: " + Buff.ToString());
+                Debug.WriteLine("Active window is null");
+                return;
+            }
+
+            activeWindow = activeWindow.ToLower();
+            JsonManager jsonManager = new JsonManager();
+            List<Application> blacklist = jsonManager.ReadApplicationList("blacklist.json");
+            List<Application> whitelist = jsonManager.ReadApplicationList("whitelist.json");
+
+            if (blacklist.Any(app => activeWindow.Contains(app.Name.ToLower()) || app.Name.ToLower().Contains(activeWindow)))
+            {
+                Debug.WriteLine("Active window is in the blacklist");
+            }
+            else
+            {
+                Debug.WriteLine("Active window is not in the blacklist");
+            }
+
+            if (whitelist.Any(app => activeWindow.Contains(app.Name.ToLower()) || app.Name.ToLower().Contains(activeWindow)))
+            {
+                Debug.WriteLine("Active window is in the whitelist");
+            }
+            else
+            {
+                Debug.WriteLine("Active window is not in the whitelist");
             }
         }
+
+
+
 
         public void ForceCloseActiveWindow()
         {
@@ -43,6 +70,27 @@ namespace Windows_App_WinUI3
                     process.Kill();
                 }
             }
+        }
+
+        public string GetActiveWindow()
+        {
+            const int nChars = 256;
+            StringBuilder Buff = new StringBuilder(nChars);
+            IntPtr handle = GetForegroundWindow();
+
+            if (GetWindowText(handle, Buff, nChars) > 0)
+            {
+                uint processId;
+                GetWindowThreadProcessId(handle, out processId);
+                Process process = Process.GetProcessById((int)processId);
+
+                if (process != null)
+                {
+                    return process.ProcessName;
+                }
+            }
+
+            return null;
         }
     }
 }
