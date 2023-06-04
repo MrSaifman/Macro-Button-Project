@@ -53,10 +53,7 @@ namespace Windows_App_WinUI3
                 Debug.WriteLine("Active window is not in the whitelist");
             }
         }
-
-
-
-
+        
         public void ForceCloseActiveWindow()
         {
             IntPtr handle = GetForegroundWindow();

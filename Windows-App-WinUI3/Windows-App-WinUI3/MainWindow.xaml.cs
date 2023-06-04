@@ -43,6 +43,11 @@ namespace Windows_App_WinUI3
 {
     public sealed partial class MainWindow : Window
     {
+        private const string DataDirectoryName = "Data";
+        private const string BlacklistJson = "blacklist.json";
+        private const string WhitelistJson = "whitelist.json";
+        private const string TempIconFolder  = "TempIcons";
+
         private const string AppSettings = "AppSettings";
         private const string FocusedAppOnly = "FocusedAppOnly";
         private const string IdleLighting = "IdleLighting";
@@ -59,6 +64,7 @@ namespace Windows_App_WinUI3
             InitializeApplication();
         }
 
+        // Initialize managers for JSON and USB device
         private void InitializeManagers()
         {
             deviceManager = new USBDeviceManager();
@@ -69,6 +75,7 @@ namespace Windows_App_WinUI3
             jsonManager.currentLightingMode = IdleLighting;
         }
 
+        // Initialize application with json settings
         private void InitializeApplication()
         {
             PopulateProgramsListBox();
@@ -77,16 +84,18 @@ namespace Windows_App_WinUI3
 
             string focusedAppOnlySetting = jsonManager.ReadSetting(AppSettings, FocusedAppOnly);
             GreetingToggleSwitch.IsOn = focusedAppOnlySetting == "True";
-            GreetingToggleSwitch_Toggled(null, null);
+            FocusedAppToggleSwitch_Toggled(null, null);
 
             InitializeDevice();
         }
 
+        // Initialize USB device
         private async void InitializeDevice()
         {
             await deviceManager.InitializeDeviceAsync();
         }
 
+        // Update UI based on selected button
         private void UpdateUIForSelectedButton(Button clickedButton, Microsoft.UI.Xaml.Shapes.Rectangle rect, Grid screen)
         {
             // Remove selection effect from previously selected button
@@ -139,7 +148,7 @@ namespace Windows_App_WinUI3
             }
         }
 
-        private void GreetingToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        private void FocusedAppToggleSwitch_Toggled(object sender, RoutedEventArgs e)
         {
             if (GreetingToggleSwitch.IsOn)
             {
@@ -176,41 +185,244 @@ namespace Windows_App_WinUI3
             }
         }
 
-        private async void PopulateProgramsListBox()
+        private void InstalledProgramsButton_Click(object sender, RoutedEventArgs e)
         {
             ObservableCollection<AppInformation> programs = new ObservableCollection<AppInformation>();
-
-            // Define the uninstall keys
-            string[] uninstallKeys =
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
             {
-                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
-                @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
-            };
-
-            // Check both HKEY_LOCAL_MACHINE and HKEY_CURRENT_USER
-            RegistryKey[] baseKeys =
-            {
-                RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64),
-                RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64)
-            };
-
-            foreach (var baseKey in baseKeys)
-            {
-                foreach (var keyPath in uninstallKeys)
-                {
-                    using (RegistryKey key = baseKey.OpenSubKey(keyPath))
-                    {
-                        if (key != null)
-                        {
-                            ProcessKeyForPrograms(key, programs);
-                        }
-                    }
-                }
+                ProcessKeyForPrograms(key, programs);
             }
-
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
+            {
+                ProcessKeyForPrograms(key, programs);
+            }
             ProgramsListBox.ItemsSource = programs;
         }
+        
+        private void ActiveProgramsButton_Click(object sender, RoutedEventArgs e)
+        {
+            ObservableCollection<AppInformation> programs = new ObservableCollection<AppInformation>();
+            ProcessKeyForRunningPrograms(programs);
+            ProgramsListBox.ItemsSource = programs;
+        }
+        
+        private void AddToBlacklist_Click(object sender, RoutedEventArgs e)
+        {
+            AppInformation selectedProgram = ProgramsListBox.SelectedItem as AppInformation;
+            if (selectedProgram != null)
+            {
+                string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+                string dataDirectory = Path.Combine(projectDirectory, DataDirectoryName);
+                string blacklistFilePath = Path.Combine(dataDirectory, BlacklistJson);
 
+                // Ensure the Data directory exists
+                Directory.CreateDirectory(dataDirectory);
+
+                ObservableCollection<AppInformation> blacklist;
+
+                // Read the existing blacklist file if it exists
+                if (File.Exists(blacklistFilePath))
+                {
+                    string jsonString = File.ReadAllText(blacklistFilePath);
+                    blacklist = JsonSerializer.Deserialize<ObservableCollection<AppInformation>>(jsonString);
+                }
+                else
+                {
+                    // If it doesn't exist, create a new list
+                    blacklist = new ObservableCollection<AppInformation>();
+                }
+
+                // Add the selected program to the list
+                if (!blacklist.Any(p => p.Name == selectedProgram.Name))
+                {
+                    blacklist.Add(selectedProgram);
+                }
+
+                // Save the list back to the file
+                string newJsonString = JsonSerializer.Serialize(blacklist);
+
+                File.WriteAllText(blacklistFilePath, newJsonString);
+
+                // Update the ListBox
+                BlackListBox.ItemsSource = blacklist;
+            }
+        }
+
+        private void AddToWhitelist_Click(object sender, RoutedEventArgs e)
+        {
+            AppInformation selectedProgram = ProgramsListBox.SelectedItem as AppInformation;
+            if (selectedProgram != null)
+            {
+                string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+                string dataDirectory = Path.Combine(projectDirectory, DataDirectoryName);
+                string whitelistFilePath = Path.Combine(dataDirectory, WhitelistJson);
+
+                // Ensure the Data directory exists
+                Directory.CreateDirectory(dataDirectory);
+
+                ObservableCollection<AppInformation> whitelist;
+
+                // Read the existing whitelist file if it exists
+                if (File.Exists(whitelistFilePath))
+                {
+                    string jsonString = File.ReadAllText(whitelistFilePath);
+                    whitelist = JsonSerializer.Deserialize<ObservableCollection<AppInformation>>(jsonString);
+                }
+                else
+                {
+                    // If it doesn't exist, create a new list
+                    whitelist = new ObservableCollection<AppInformation>();
+                }
+
+                // Add the selected program to the list
+                if (!whitelist.Any(p => p.Name == selectedProgram.Name))
+                {
+                    whitelist.Add(selectedProgram);
+                }
+
+                // Save the list back to the file
+                string newJsonString = JsonSerializer.Serialize(whitelist);
+
+                File.WriteAllText(whitelistFilePath, newJsonString);
+                // Update the ListBox
+                WhiteListBox.ItemsSource = whitelist;
+            }
+        }
+        
+        private void RemoveFromWhitelist_Click(object sender, RoutedEventArgs e)
+        {
+            string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+            string dataDirectory = Path.Combine(projectDirectory, DataDirectoryName);
+            string whitelistFilePath = Path.Combine(dataDirectory, WhitelistJson);
+
+            // Get the selected program
+            AppInformation selectedProgram = (AppInformation)WhiteListBox.SelectedItem;
+
+            if (selectedProgram != null)
+            {
+                // Load the current whitelist
+                string jsonString = File.ReadAllText(whitelistFilePath);
+                List<AppInformation> whitelist = JsonSerializer.Deserialize<List<AppInformation>>(jsonString);
+
+                // Remove the selected program
+                whitelist.RemoveAll(p => p.Name == selectedProgram.Name);
+
+                // Save the list back to the file
+                string newJsonString = JsonSerializer.Serialize(whitelist);
+                File.WriteAllText(whitelistFilePath, newJsonString);
+
+                // Update the ListBox
+                WhiteListBox.ItemsSource = whitelist;
+            }
+        }
+
+        private void RemoveFromBlacklist_Click(object sender, RoutedEventArgs e)
+        {
+            string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+            string dataDirectory = Path.Combine(projectDirectory, DataDirectoryName);
+            string blacklistFilePath = Path.Combine(dataDirectory, BlacklistJson);
+
+            // Get the selected program
+            AppInformation selectedProgram = (AppInformation)BlackListBox.SelectedItem;
+
+            if (selectedProgram != null)
+            {
+                // Load the current blacklist
+                string jsonString = File.ReadAllText(blacklistFilePath);
+                List<AppInformation> blacklist = JsonSerializer.Deserialize<List<AppInformation>>(jsonString);
+
+                // Remove the selected program
+                blacklist.RemoveAll(p => p.Name == selectedProgram.Name);
+
+                // Save the list back to the file
+                string newJsonString = JsonSerializer.Serialize(blacklist);
+                File.WriteAllText(blacklistFilePath, newJsonString);
+
+                // Update the ListBox
+                BlackListBox.ItemsSource = blacklist;
+            }
+        }
+
+        private void ColorButton_Click(object sender, RoutedEventArgs e)
+        {
+            _currentColorSelectionButton = (Button)sender;
+            ColorPickerControl.Color = ((SolidColorBrush)_currentColorSelectionButton.Background).Color;
+            ColorPickerControl.ColorChanged += ColorPickerControl_ColorChanged;
+            ColorPickerControl.Visibility = Visibility.Visible;
+        }
+        
+        private async void ColorPickerControl_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
+        {
+            if (_currentColorSelectionButton != null)
+            {
+                _currentColorSelectionButton.Background = new SolidColorBrush(sender.Color);
+
+                byte reportValue = GetReportForTag((string)_currentColorSelectionButton.Tag);
+
+                // Construct the report data
+                byte[] reportData = new byte[]
+                {
+                    0x01, 0x01, reportValue,
+                    ColorPickerControl.Color.R,
+                    ColorPickerControl.Color.G,
+                    ColorPickerControl.Color.B
+                };
+
+                await deviceManager.ReadWriteToHidDevice(reportData);
+
+            }
+        }
+        
+        private async void ColorPickerControl_LostFocus(object sender, RoutedEventArgs e)
+        {
+            ColorPickerControl.Visibility = Visibility.Collapsed;
+            ColorPickerControl.ColorChanged -= ColorPickerControl_ColorChanged;
+            // Update setting in JSON file
+            if (_currentColorSelectionButton != null)
+            {
+                string settingName = _currentColorSelectionButton.Tag.ToString();
+                jsonManager.UpdateSetting(jsonManager.currentLightingMode, settingName, ColorPickerControl.Color.ToString());
+            }
+        }
+
+        public async void Slider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        {
+            if (jsonManager == null)
+            {
+                // Initialize jsonManager here, or return if it's not supposed to be null at this point.
+                return;
+            }
+
+            Slider slider = (Slider)sender;
+            double value = slider.Value;
+
+            string settingName = (string)slider.Tag;
+
+            jsonManager.UpdateSetting(jsonManager.currentLightingMode, settingName, value.ToString());
+
+            byte[] reportData;
+            if (settingName == "Brightness")
+            {
+                reportData = new byte[]
+                {
+                    0x01, 0x01, 0x02, 0x00, 0x00, Convert.ToByte(value)
+                };
+            }
+            else if (settingName == "PatternSpeed")
+            {
+                reportData = new byte[]
+                {
+                    0x01, 0x01, 0x01, 0x00, 0x00, Convert.ToByte(value)
+                };
+            }
+            else
+            {
+                // Unknown slider setting. Do nothing or handle error appropriately.
+                return;
+            }
+
+            await deviceManager.ReadWriteToHidDevice(reportData);
+        }
 
         private async void SearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
@@ -254,8 +466,8 @@ namespace Windows_App_WinUI3
         private async void ProcessKeyForPrograms(RegistryKey key, ObservableCollection<AppInformation> programs, string searchTerm = null)
         {
             string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
-            string dataDirectory = Path.Combine(projectDirectory, "Data");
-            string tempDirectory = Path.Combine(dataDirectory, "TempIcons");
+            string dataDirectory = Path.Combine(projectDirectory, DataDirectoryName);
+            string tempDirectory = Path.Combine(dataDirectory, TempIconFolder);
 
             // Create the TempIcons directory if it doesn't exist
             if (!Directory.Exists(tempDirectory))
@@ -324,8 +536,6 @@ namespace Windows_App_WinUI3
             }
         }
 
-
-
         //Used to remove the temp folder when its done. Need to implement this
         //DeleteTempIcons(tempDirectory);
         public void DeleteTempIcons(string tempDirectory)
@@ -336,6 +546,117 @@ namespace Windows_App_WinUI3
             }
         }
 
+        private async void PopulateProgramsListBox()
+        {
+            ObservableCollection<AppInformation> programs = new ObservableCollection<AppInformation>();
+
+            // Define the uninstall keys
+            string[] uninstallKeys =
+            {
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+                @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+            };
+
+            // Check both HKEY_LOCAL_MACHINE and HKEY_CURRENT_USER
+            RegistryKey[] baseKeys =
+            {
+                RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64),
+                RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64)
+            };
+
+            foreach (var baseKey in baseKeys)
+            {
+                foreach (var keyPath in uninstallKeys)
+                {
+                    using (RegistryKey key = baseKey.OpenSubKey(keyPath))
+                    {
+                        if (key != null)
+                        {
+                            ProcessKeyForPrograms(key, programs);
+                        }
+                    }
+                }
+            }
+
+            ProgramsListBox.ItemsSource = programs;
+        }
+
+        private void PopulateBlackAndWhiteLists()
+        {
+            string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+            string dataDirectory = Path.Combine(projectDirectory, DataDirectoryName);
+
+            string blacklistFilePath = Path.Combine(dataDirectory, BlacklistJson);
+            string whitelistFilePath = Path.Combine(dataDirectory, WhitelistJson);
+
+            // Ensure the Data directory exists
+            Directory.CreateDirectory(dataDirectory);
+
+            if (File.Exists(blacklistFilePath))
+            {
+                string jsonString = File.ReadAllText(blacklistFilePath);
+                BlackListBox.ItemsSource = JsonSerializer.Deserialize<ObservableCollection<AppInformation>>(jsonString);
+            }
+
+            if (File.Exists(whitelistFilePath))
+            {
+                string jsonString = File.ReadAllText(whitelistFilePath);
+                WhiteListBox.ItemsSource = JsonSerializer.Deserialize<ObservableCollection<AppInformation>>(jsonString);
+            }
+        }
+        
+        // Populates the UI with the lighting settings for a given category.
+        public void PopulateLightSettings(string lightingCategory)
+        {
+            // Validate the input
+            List<string> validCategories = new List<string> { IdleLighting, "ButtonPressLighting", "LidLiftLighting" };
+            if (!validCategories.Contains(lightingCategory))
+            {
+                throw new ArgumentException($"{lightingCategory} is not a valid lighting category. Valid categories are {string.Join(", ", validCategories)}");
+            }
+
+            // lighting settings
+            var lightUpPattern = jsonManager.ReadSetting(lightingCategory, "LightUpPattern");
+            var brightness = int.Parse(jsonManager.ReadSetting(lightingCategory, "Brightness"));
+            var patternSpeed = int.Parse(jsonManager.ReadSetting(lightingCategory, "PatternSpeed"));
+            var frameColor1 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "FrameColor1"));
+            var frameColor2 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "FrameColor2"));
+            var buttonColor1 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "ButtonColor1"));
+            var buttonColor2 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "ButtonColor2"));
+
+            // Assign these values to the corresponding controls
+            foreach (ComboBoxItem item in lightUpPatternComboBox.Items)
+            {
+                if (item.Content.ToString() == lightUpPattern)
+                {
+                    // Temporarily remove the event handler.
+                    lightUpPatternComboBox.SelectionChanged -= ComboBox_SelectionChanged;
+
+                    lightUpPatternComboBox.SelectedItem = item;
+
+                    // Re-add the event handler.
+                    lightUpPatternComboBox.SelectionChanged += ComboBox_SelectionChanged;
+
+                    break;
+                }
+            }
+
+            // Temporarily remove the event handlers for the sliders.
+            brightnessSlider.ValueChanged -= Slider_ValueChanged;
+            patternSlider.ValueChanged -= Slider_ValueChanged;
+
+            brightnessSlider.Value = brightness;
+            patternSlider.Value = patternSpeed;
+
+            // Re-add the event handlers for the sliders.
+            brightnessSlider.ValueChanged += Slider_ValueChanged;
+            patternSlider.ValueChanged += Slider_ValueChanged;
+
+            FrameColorButton1.Background = new SolidColorBrush(frameColor1);
+            FrameColorButton2.Background = new SolidColorBrush(frameColor2);
+            ButtonColorButton1.Background = new SolidColorBrush(buttonColor1);
+            ButtonColorButton2.Background = new SolidColorBrush(buttonColor2);
+        }
 
         private void ProcessKeyForRunningPrograms(ObservableCollection<AppInformation> programs)
         {
@@ -356,217 +677,6 @@ namespace Windows_App_WinUI3
             }
         }
 
-        private void InstalledProgramsButton_Click(object sender, RoutedEventArgs e)
-        {
-            ObservableCollection<AppInformation> programs = new ObservableCollection<AppInformation>();
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
-            {
-                ProcessKeyForPrograms(key, programs);
-            }
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
-            {
-                ProcessKeyForPrograms(key, programs);
-            }
-            ProgramsListBox.ItemsSource = programs;
-        }
-        private void ActiveProgramsButton_Click(object sender, RoutedEventArgs e)
-        {
-            ObservableCollection<AppInformation> programs = new ObservableCollection<AppInformation>();
-            ProcessKeyForRunningPrograms(programs);
-            ProgramsListBox.ItemsSource = programs;
-        }
-
-        private void AddToBlacklist_Click(object sender, RoutedEventArgs e)
-        {
-            AppInformation selectedProgram = ProgramsListBox.SelectedItem as AppInformation;
-            if (selectedProgram != null)
-            {
-                string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
-                string dataDirectory = Path.Combine(projectDirectory, "Data");
-                string blacklistFilePath = Path.Combine(dataDirectory, "blacklist.json");
-
-                // Ensure the Data directory exists
-                Directory.CreateDirectory(dataDirectory);
-
-                ObservableCollection<AppInformation> blacklist;
-
-                // Read the existing blacklist file if it exists
-                if (File.Exists(blacklistFilePath))
-                {
-                    string jsonString = File.ReadAllText(blacklistFilePath);
-                    blacklist = JsonSerializer.Deserialize<ObservableCollection<AppInformation>>(jsonString);
-                }
-                else
-                {
-                    // If it doesn't exist, create a new list
-                    blacklist = new ObservableCollection<AppInformation>();
-                }
-
-                // Add the selected program to the list
-                if (!blacklist.Any(p => p.Name == selectedProgram.Name))
-                {
-                    blacklist.Add(selectedProgram);
-                }
-
-                // Save the list back to the file
-                string newJsonString = JsonSerializer.Serialize(blacklist);
-
-                File.WriteAllText(blacklistFilePath, newJsonString);
-
-                // Update the ListBox
-                BlackListBox.ItemsSource = blacklist;
-            }
-        }
-
-        private void AddToWhitelist_Click(object sender, RoutedEventArgs e)
-        {
-            AppInformation selectedProgram = ProgramsListBox.SelectedItem as AppInformation;
-            if (selectedProgram != null)
-            {
-                string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
-                string dataDirectory = Path.Combine(projectDirectory, "Data");
-                string whitelistFilePath = Path.Combine(dataDirectory, "whitelist.json");
-
-                // Ensure the Data directory exists
-                Directory.CreateDirectory(dataDirectory);
-
-                ObservableCollection<AppInformation> whitelist;
-
-                // Read the existing whitelist file if it exists
-                if (File.Exists(whitelistFilePath))
-                {
-                    string jsonString = File.ReadAllText(whitelistFilePath);
-                    whitelist = JsonSerializer.Deserialize<ObservableCollection<AppInformation>>(jsonString);
-                }
-                else
-                {
-                    // If it doesn't exist, create a new list
-                    whitelist = new ObservableCollection<AppInformation>();
-                }
-
-                // Add the selected program to the list
-                if (!whitelist.Any(p => p.Name == selectedProgram.Name))
-                {
-                    whitelist.Add(selectedProgram);
-                }
-
-                // Save the list back to the file
-                string newJsonString = JsonSerializer.Serialize(whitelist);
-
-                File.WriteAllText(whitelistFilePath, newJsonString);
-                // Update the ListBox
-                WhiteListBox.ItemsSource = whitelist;
-            }
-        }
-
-        private void PopulateBlackAndWhiteLists()
-        {
-            string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
-            string dataDirectory = Path.Combine(projectDirectory, "Data");
-
-            string blacklistFilePath = Path.Combine(dataDirectory, "blacklist.json");
-            string whitelistFilePath = Path.Combine(dataDirectory, "whitelist.json");
-
-            // Ensure the Data directory exists
-            Directory.CreateDirectory(dataDirectory);
-
-            if (File.Exists(blacklistFilePath))
-            {
-                string jsonString = File.ReadAllText(blacklistFilePath);
-                BlackListBox.ItemsSource = JsonSerializer.Deserialize<ObservableCollection<AppInformation>>(jsonString);
-            }
-
-            if (File.Exists(whitelistFilePath))
-            {
-                string jsonString = File.ReadAllText(whitelistFilePath);
-                WhiteListBox.ItemsSource = JsonSerializer.Deserialize<ObservableCollection<AppInformation>>(jsonString);
-            }
-        }
-
-        private void RemoveFromWhitelist_Click(object sender, RoutedEventArgs e)
-        {
-            string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
-            string dataDirectory = Path.Combine(projectDirectory, "Data");
-            string whitelistFilePath = Path.Combine(dataDirectory, "whitelist.json");
-
-            // Get the selected program
-            AppInformation selectedProgram = (AppInformation)WhiteListBox.SelectedItem;
-
-            if (selectedProgram != null)
-            {
-                // Load the current whitelist
-                string jsonString = File.ReadAllText(whitelistFilePath);
-                List<AppInformation> whitelist = JsonSerializer.Deserialize<List<AppInformation>>(jsonString);
-
-                // Remove the selected program
-                whitelist.RemoveAll(p => p.Name == selectedProgram.Name);
-
-                // Save the list back to the file
-                string newJsonString = JsonSerializer.Serialize(whitelist);
-                File.WriteAllText(whitelistFilePath, newJsonString);
-
-                // Update the ListBox
-                WhiteListBox.ItemsSource = whitelist;
-            }
-        }
-
-        private void RemoveFromBlacklist_Click(object sender, RoutedEventArgs e)
-        {
-            string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
-            string dataDirectory = Path.Combine(projectDirectory, "Data");
-            string blacklistFilePath = Path.Combine(dataDirectory, "blacklist.json");
-
-            // Get the selected program
-            AppInformation selectedProgram = (AppInformation)BlackListBox.SelectedItem;
-
-            if (selectedProgram != null)
-            {
-                // Load the current blacklist
-                string jsonString = File.ReadAllText(blacklistFilePath);
-                List<AppInformation> blacklist = JsonSerializer.Deserialize<List<AppInformation>>(jsonString);
-
-                // Remove the selected program
-                blacklist.RemoveAll(p => p.Name == selectedProgram.Name);
-
-                // Save the list back to the file
-                string newJsonString = JsonSerializer.Serialize(blacklist);
-                File.WriteAllText(blacklistFilePath, newJsonString);
-
-                // Update the ListBox
-                BlackListBox.ItemsSource = blacklist;
-            }
-        }
-
-        private void ColorButton_Click(object sender, RoutedEventArgs e)
-        {
-            _currentColorSelectionButton = (Button)sender;
-            ColorPickerControl.Color = ((SolidColorBrush)_currentColorSelectionButton.Background).Color;
-            ColorPickerControl.ColorChanged += ColorPickerControl_ColorChanged;
-            ColorPickerControl.Visibility = Visibility.Visible;
-        }
-
-        private async void ColorPickerControl_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
-        {
-            if (_currentColorSelectionButton != null)
-            {
-                _currentColorSelectionButton.Background = new SolidColorBrush(sender.Color);
-
-                byte reportValue = GetReportForTag((string)_currentColorSelectionButton.Tag);
-
-                // Construct the report data
-                byte[] reportData = new byte[]
-                {
-                    0x01, 0x01, reportValue,
-                    ColorPickerControl.Color.R,
-                    ColorPickerControl.Color.G,
-                    ColorPickerControl.Color.B
-                };
-
-                await deviceManager.ReadWriteToHidDevice(reportData);
-
-            }
-        }
-
         private byte GetReportForTag(string tag)
         {
             switch (tag)
@@ -578,18 +688,7 @@ namespace Windows_App_WinUI3
                 default: return 0x00; // Default case if no match
             }
         }
-        private async void ColorPickerControl_LostFocus(object sender, RoutedEventArgs e)
-        {
-            ColorPickerControl.Visibility = Visibility.Collapsed;
-            ColorPickerControl.ColorChanged -= ColorPickerControl_ColorChanged;
-            // Update setting in JSON file
-            if (_currentColorSelectionButton != null)
-            {
-                string settingName = _currentColorSelectionButton.Tag.ToString();
-                jsonManager.UpdateSetting(jsonManager.currentLightingMode, settingName, ColorPickerControl.Color.ToString());
-            }
-        }
-
+        
         private void LightingModeChange(object sender, RoutedEventArgs e)
         {
             // Reset all buttons to black
@@ -651,45 +750,6 @@ namespace Windows_App_WinUI3
             }
         }
 
-        public async void Slider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
-        {
-            if (jsonManager == null)
-            {
-                // Initialize jsonManager here, or return if it's not supposed to be null at this point.
-                return;
-            }
-
-            Slider slider = (Slider)sender;
-            double value = slider.Value;
-
-            string settingName = (string)slider.Tag;
-
-            jsonManager.UpdateSetting(jsonManager.currentLightingMode, settingName, value.ToString());
-
-            byte[] reportData;
-            if (settingName == "Brightness")
-            {
-                reportData = new byte[]
-                {
-                    0x01, 0x01, 0x02, 0x00, 0x00, Convert.ToByte(value)
-                };
-            }
-            else if (settingName == "PatternSpeed")
-            {
-                reportData = new byte[]
-                {
-                    0x01, 0x01, 0x01, 0x00, 0x00, Convert.ToByte(value)
-                };
-            }
-            else
-            {
-                // Unknown slider setting. Do nothing or handle error appropriately.
-                return;
-            }
-
-            await deviceManager.ReadWriteToHidDevice(reportData);
-        }
-
         public static Windows.UI.Color ConvertStringToColor(string hex)
         {
             if (string.IsNullOrEmpty(hex) || hex.Length != 9 || !hex.StartsWith("#"))
@@ -705,58 +765,5 @@ namespace Windows_App_WinUI3
             var b = (byte)(Convert.ToUInt32(hex.Substring(6, 2), 16));
             return Windows.UI.Color.FromArgb(a, r, g, b);
         }
-
-        public void PopulateLightSettings(string lightingCategory)
-        {
-            // Validate the input
-            List<string> validCategories = new List<string> { IdleLighting, "ButtonPressLighting", "LidLiftLighting" };
-            if (!validCategories.Contains(lightingCategory))
-            {
-                throw new ArgumentException($"{lightingCategory} is not a valid lighting category. Valid categories are {string.Join(", ", validCategories)}");
-            }
-
-            // lighting settings
-            var lightUpPattern = jsonManager.ReadSetting(lightingCategory, "LightUpPattern");
-            var brightness = int.Parse(jsonManager.ReadSetting(lightingCategory, "Brightness"));
-            var patternSpeed = int.Parse(jsonManager.ReadSetting(lightingCategory, "PatternSpeed"));
-            var frameColor1 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "FrameColor1"));
-            var frameColor2 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "FrameColor2"));
-            var buttonColor1 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "ButtonColor1"));
-            var buttonColor2 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "ButtonColor2"));
-
-            // Assign these values to the corresponding controls
-            foreach (ComboBoxItem item in lightUpPatternComboBox.Items)
-            {
-                if (item.Content.ToString() == lightUpPattern)
-                {
-                    // Temporarily remove the event handler.
-                    lightUpPatternComboBox.SelectionChanged -= ComboBox_SelectionChanged;
-
-                    lightUpPatternComboBox.SelectedItem = item;
-
-                    // Re-add the event handler.
-                    lightUpPatternComboBox.SelectionChanged += ComboBox_SelectionChanged;
-
-                    break;
-                }
-            }
-
-            // Temporarily remove the event handlers for the sliders.
-            brightnessSlider.ValueChanged -= Slider_ValueChanged;
-            patternSlider.ValueChanged -= Slider_ValueChanged;
-
-            brightnessSlider.Value = brightness;
-            patternSlider.Value = patternSpeed;
-
-            // Re-add the event handlers for the sliders.
-            brightnessSlider.ValueChanged += Slider_ValueChanged;
-            patternSlider.ValueChanged += Slider_ValueChanged;
-
-            FrameColorButton1.Background = new SolidColorBrush(frameColor1);
-            FrameColorButton2.Background = new SolidColorBrush(frameColor2);
-            ButtonColorButton1.Background = new SolidColorBrush(buttonColor1);
-            ButtonColorButton2.Background = new SolidColorBrush(buttonColor2);
-        }
-
     }
 }
