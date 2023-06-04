@@ -29,5 +29,12 @@ namespace Windows_App_WinUI3
         {
             return HashCode.Combine(Name, Icon.UriSource, Path);
         }
+
+        public AppInformation(string name, BitmapImage icon, string path)
+        {
+            Name = name;
+            Icon = icon;
+            Path = path;
+        }
     }
 }

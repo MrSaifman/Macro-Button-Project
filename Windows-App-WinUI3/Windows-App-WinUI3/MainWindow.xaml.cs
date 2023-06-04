@@ -1,6 +1,26 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+// System namespaces
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.IO.Pipes;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text.Json;
+using System.Windows;
+
+// Windows namespaces
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.Storage;
+using Windows.UI;
+
+// Microsoft namespaces
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -8,58 +28,35 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI;
-using System.Windows;
-using Microsoft.UI.Xaml.Interop;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml.Interop;
 using Microsoft.Win32;
-using Windows.Storage;
-using System.Diagnostics;
-using System.Collections.ObjectModel;
-using System.Text.Json;
 
+// Project specific namespaces
 using Windows_App_WinUI3.FileHandlers;
-using System.Drawing;
-using System.IO.Pipes;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Windows_App_WinUI3
 {
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainWindow : Window
     {
+        private const string AppSettings = "AppSettings";
+        private const string FocusedAppOnly = "FocusedAppOnly";
+        private const string IdleLighting = "IdleLighting";
+
         private JsonManager jsonManager;
         private USBDeviceManager deviceManager;
-        private Button _selectedButton;
-        private Button _currentColorButton;
+        private Button _selectedNavigationButton;
+        private Button _currentColorSelectionButton;
 
         public MainWindow()
         {
             this.InitializeComponent();
             InitializeManagers();
-            
-            PopulateProgramsListBox();
-            PopulateBlackAndWhiteLists();
-            PopulateLightSettings("IdleLighting");
-
-            string focusedAppOnlySetting = jsonManager.ReadSetting("AppSettings", "FocusedAppOnly");
-            GreetingToggleSwitch.IsOn = focusedAppOnlySetting == "True";
-            GreetingToggleSwitch_Toggled(null, null);
-
-            InitializeDevice();
-
+            InitializeApplication();
         }
 
         private void InitializeManagers()
@@ -69,7 +66,20 @@ namespace Windows_App_WinUI3
 
             jsonManager = new JsonManager();
             jsonManager.EnsureDefaultSettingsExist();
-            jsonManager.currentLightingMode = "IdleLighting";
+            jsonManager.currentLightingMode = IdleLighting;
+        }
+
+        private void InitializeApplication()
+        {
+            PopulateProgramsListBox();
+            PopulateBlackAndWhiteLists();
+            PopulateLightSettings(IdleLighting);
+
+            string focusedAppOnlySetting = jsonManager.ReadSetting(AppSettings, FocusedAppOnly);
+            GreetingToggleSwitch.IsOn = focusedAppOnlySetting == "True";
+            GreetingToggleSwitch_Toggled(null, null);
+
+            InitializeDevice();
         }
 
         private async void InitializeDevice()
@@ -77,69 +87,55 @@ namespace Windows_App_WinUI3
             await deviceManager.InitializeDeviceAsync();
         }
 
+        private void UpdateUIForSelectedButton(Button clickedButton, Microsoft.UI.Xaml.Shapes.Rectangle rect, Grid screen)
+        {
+            // Remove selection effect from previously selected button
+            if (_selectedNavigationButton != null)
+            {
+                _selectedNavigationButton.BorderBrush = new SolidColorBrush(Colors.Transparent);
+                _selectedNavigationButton.Foreground = new SolidColorBrush(Colors.White);
+                _selectedNavigationButton.BorderThickness = new Thickness(0);
+            }
+
+            // Set the clicked button as the selected button
+            _selectedNavigationButton = clickedButton;
+
+            // Reset all rectangles' opacity
+            rectDashboard.Opacity = 0;
+            rectRageMode.Opacity = 0;
+            rectMacroMode.Opacity = 0;
+            rectLighting.Opacity = 0;
+
+            // Reset all screens' visibility
+            DashboardScreen.Visibility = Visibility.Collapsed;
+            RageModeScreen.Visibility = Visibility.Collapsed;
+            MacroModeScreen.Visibility = Visibility.Collapsed;
+            LightingScreen.Visibility = Visibility.Collapsed;
+
+            // Set the selected rectangle's opacity and screen's visibility
+            rect.Opacity = 1;
+            screen.Visibility = Visibility.Visible;
+        }
+
         private void NavButton_Click(object sender, RoutedEventArgs e)
         {
             Button clickedButton = sender as Button;
 
-            // Remove selection effect from previously selected button
-            if (_selectedButton != null)
-            {
-                _selectedButton.BorderBrush = new SolidColorBrush(Colors.Transparent);
-                _selectedButton.Foreground = new SolidColorBrush(Colors.White);
-                _selectedButton.BorderThickness = new Thickness(0);
-            }
-
-            // Set the clicked button as the selected button
-            _selectedButton = clickedButton;
-
-            // Show the rectangle corresponding to the clicked button, and lower the opacity of the others
             if (clickedButton == btnDashboard)
             {
-                rectDashboard.Opacity = 1;
-                rectRageMode.Opacity = 0;
-                rectMacroMode.Opacity = 0;
-                rectLighting.Opacity = 0;
-
-                DashboardScreen.Visibility = Visibility.Visible;
-                RageModeScreen.Visibility = Visibility.Collapsed;
-                MacroModeScreen.Visibility = Visibility.Collapsed;
-                LightingScreen.Visibility = Visibility.Collapsed;
+                UpdateUIForSelectedButton(clickedButton, rectDashboard, DashboardScreen);
             }
             else if (clickedButton == btnRageMode)
             {
-                rectDashboard.Opacity = 0;
-                rectRageMode.Opacity = 1;
-                rectMacroMode.Opacity = 0;
-                rectLighting.Opacity = 0;
-
-                DashboardScreen.Visibility = Visibility.Collapsed;
-                RageModeScreen.Visibility = Visibility.Visible;
-                MacroModeScreen.Visibility = Visibility.Collapsed;
-                LightingScreen.Visibility = Visibility.Collapsed;
+                UpdateUIForSelectedButton(clickedButton, rectRageMode, RageModeScreen);
             }
             else if (clickedButton == btnMacroMode)
             {
-                rectDashboard.Opacity = 0;
-                rectRageMode.Opacity = 0;
-                rectMacroMode.Opacity = 1;
-                rectLighting.Opacity = 0;
-
-                DashboardScreen.Visibility = Visibility.Collapsed;
-                RageModeScreen.Visibility = Visibility.Collapsed;
-                MacroModeScreen.Visibility = Visibility.Visible;
-                LightingScreen.Visibility = Visibility.Collapsed;
+                UpdateUIForSelectedButton(clickedButton, rectMacroMode, MacroModeScreen);
             }
             else if (clickedButton == btnLighting)
             {
-                rectDashboard.Opacity = 0;
-                rectRageMode.Opacity = 0;
-                rectMacroMode.Opacity = 0;
-                rectLighting.Opacity = 1;
-
-                DashboardScreen.Visibility = Visibility.Collapsed;
-                RageModeScreen.Visibility = Visibility.Collapsed;
-                MacroModeScreen.Visibility = Visibility.Collapsed;
-                LightingScreen.Visibility = Visibility.Visible;
+                UpdateUIForSelectedButton(clickedButton, rectLighting, LightingScreen);
             }
         }
 
@@ -155,7 +151,7 @@ namespace Windows_App_WinUI3
             }
 
             // Update the JSON when the switch is toggled.
-            jsonManager.UpdateSetting("AppSettings", "FocusedAppOnly", GreetingToggleSwitch.IsOn.ToString());
+            jsonManager.UpdateSetting(AppSettings, FocusedAppOnly, GreetingToggleSwitch.IsOn.ToString());
         }
 
         private void NavButton_PointerEntered(object sender, PointerRoutedEventArgs e)
@@ -163,7 +159,7 @@ namespace Windows_App_WinUI3
             Button hoveredButton = sender as Button;
 
             // Change the button text color to orange if it's not the selected button
-            if (_selectedButton != hoveredButton)
+            if (_selectedNavigationButton != hoveredButton)
             {
                 hoveredButton.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xff, 0xff, 0x6b, 0x27));
             }
@@ -174,7 +170,7 @@ namespace Windows_App_WinUI3
             Button hoveredButton = sender as Button;
 
             // Change the button text color to white if it's not the selected button
-            if (_selectedButton != hoveredButton)
+            if (_selectedNavigationButton != hoveredButton)
             {
                 hoveredButton.Foreground = new SolidColorBrush(Colors.White);
             }
@@ -320,7 +316,7 @@ namespace Windows_App_WinUI3
                                     icon = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
                                 }
                             }
-                            programs.Add(new AppInformation { Name = name, Icon = icon, Path = appPath });
+                            programs.Add(new AppInformation(name, icon, appPath));
                         }
                     }
                     catch { }
@@ -353,7 +349,7 @@ namespace Windows_App_WinUI3
                         string appPath = process.MainModule.FileName;
 
                         // Create a new Program object with the name and path of the running program
-                        programs.Add(new AppInformation { Name = name, Path = appPath });
+                        programs.Add(new AppInformation(name, null, appPath));
                     }
                 }
                 catch { }
@@ -543,19 +539,19 @@ namespace Windows_App_WinUI3
 
         private void ColorButton_Click(object sender, RoutedEventArgs e)
         {
-            _currentColorButton = (Button)sender;
-            ColorPickerControl.Color = ((SolidColorBrush)_currentColorButton.Background).Color;
+            _currentColorSelectionButton = (Button)sender;
+            ColorPickerControl.Color = ((SolidColorBrush)_currentColorSelectionButton.Background).Color;
             ColorPickerControl.ColorChanged += ColorPickerControl_ColorChanged;
             ColorPickerControl.Visibility = Visibility.Visible;
         }
 
         private async void ColorPickerControl_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
         {
-            if (_currentColorButton != null)
+            if (_currentColorSelectionButton != null)
             {
-                _currentColorButton.Background = new SolidColorBrush(sender.Color);
+                _currentColorSelectionButton.Background = new SolidColorBrush(sender.Color);
 
-                byte reportValue = GetReportForTag((string)_currentColorButton.Tag);
+                byte reportValue = GetReportForTag((string)_currentColorSelectionButton.Tag);
 
                 // Construct the report data
                 byte[] reportData = new byte[]
@@ -587,9 +583,9 @@ namespace Windows_App_WinUI3
             ColorPickerControl.Visibility = Visibility.Collapsed;
             ColorPickerControl.ColorChanged -= ColorPickerControl_ColorChanged;
             // Update setting in JSON file
-            if (_currentColorButton != null)
+            if (_currentColorSelectionButton != null)
             {
-                string settingName = _currentColorButton.Tag.ToString();
+                string settingName = _currentColorSelectionButton.Tag.ToString();
                 jsonManager.UpdateSetting(jsonManager.currentLightingMode, settingName, ColorPickerControl.Color.ToString());
             }
         }
@@ -713,7 +709,7 @@ namespace Windows_App_WinUI3
         public void PopulateLightSettings(string lightingCategory)
         {
             // Validate the input
-            List<string> validCategories = new List<string> { "IdleLighting", "ButtonPressLighting", "LidLiftLighting" };
+            List<string> validCategories = new List<string> { IdleLighting, "ButtonPressLighting", "LidLiftLighting" };
             if (!validCategories.Contains(lightingCategory))
             {
                 throw new ArgumentException($"{lightingCategory} is not a valid lighting category. Valid categories are {string.Join(", ", validCategories)}");

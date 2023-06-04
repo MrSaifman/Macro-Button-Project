@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-
+using System.Text.Json.Serialization;
 namespace Windows_App_WinUI3.FileHandlers
 {
     public class JsonManager
@@ -251,6 +251,63 @@ namespace Windows_App_WinUI3.FileHandlers
         public string Name { get; set; }
         public Icon Icon { get; set; }
         public string Path { get; set; }
+    }
+
+    public class LightingMode
+    {
+        [JsonPropertyName("LightUpPattern")]
+        public string LightUpPattern { get; set; }
+
+        [JsonPropertyName("Brightness")]
+        public string Brightness { get; set; }
+
+        [JsonPropertyName("PatternSpeed")]
+        public string PatternSpeed { get; set; }
+
+        [JsonPropertyName("FrameColor1")]
+        public string FrameColor1 { get; set; }
+
+        [JsonPropertyName("FrameColor2")]
+        public string FrameColor2 { get; set; }
+
+        [JsonPropertyName("ButtonColor1")]
+        public string ButtonColor1 { get; set; }
+
+        [JsonPropertyName("ButtonColor2")]
+        public string ButtonColor2 { get; set; }
+    }
+
+    public class LightingSettings
+    {
+        [JsonPropertyName("IdleLighting")]
+        public LightingMode IdleLighting { get; set; }
+
+        [JsonPropertyName("ButtonPressLighting")]
+        public LightingMode ButtonPressLighting { get; set; }
+
+        [JsonPropertyName("LidLiftLighting")]
+        public LightingMode LidLiftLighting { get; set; }
+    }
+
+    public class AppSettings
+    {
+        [JsonPropertyName("FocusedAppOnly")]
+        public string FocusedAppOnly { get; set; }
+    }
+
+    public class Settings
+    {
+        [JsonPropertyName("LightingSettings")]
+        public LightingSettings LightingSettings { get; set; }
+
+        [JsonPropertyName("AppSettings")]
+        public AppSettings AppSettings { get; set; }
+    }
+
+    public class Root
+    {
+        [JsonPropertyName("Settings")]
+        public Settings Settings { get; set; }
     }
 
 }
