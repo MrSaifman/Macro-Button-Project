@@ -373,7 +373,7 @@ namespace Windows_App_WinUI3
             }
         }
         
-        private async void ColorPickerControl_LostFocus(object sender, RoutedEventArgs e)
+        private void ColorPickerControl_LostFocus(object sender, RoutedEventArgs e)
         {
             ColorPickerControl.Visibility = Visibility.Collapsed;
             ColorPickerControl.ColorChanged -= ColorPickerControl_ColorChanged;
@@ -424,7 +424,7 @@ namespace Windows_App_WinUI3
             await deviceManager.ReadWriteToHidDevice(reportData);
         }
 
-        private async void SearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private void SearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             // Get the search term from the AutoSuggestBox
             string searchTerm = sender.Text.ToLowerInvariant();
@@ -463,7 +463,7 @@ namespace Windows_App_WinUI3
             ProgramsListBox.ItemsSource = programs;
         }
 
-        private async void ProcessKeyForPrograms(RegistryKey key, ObservableCollection<AppInformation> programs, string searchTerm = null)
+        private void ProcessKeyForPrograms(RegistryKey key, ObservableCollection<AppInformation> programs, string searchTerm = null)
         {
             string projectDirectory = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
             string dataDirectory = Path.Combine(projectDirectory, DataDirectoryName);
@@ -546,7 +546,7 @@ namespace Windows_App_WinUI3
             }
         }
 
-        private async void PopulateProgramsListBox()
+        private void PopulateProgramsListBox()
         {
             ObservableCollection<AppInformation> programs = new ObservableCollection<AppInformation>();
 

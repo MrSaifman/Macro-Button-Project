@@ -100,7 +100,7 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Text="Focused App Only" FontSize="24" Margin="0,0,0,5" HorizontalAlignment="Center" />
-                            <ToggleSwitch Grid.Row="1" x:Name="GreetingToggleSwitch" Margin="90,0,0,5" OnContent="" OffContent="" Toggled="GreetingToggleSwitch_Toggled" FontSize="20" HorizontalAlignment="Center">
+                            <ToggleSwitch Grid.Row="1" x:Name="GreetingToggleSwitch" Margin="90,0,0,5" OnContent="" OffContent="" Toggled="FocusedAppToggleSwitch_Toggled" FontSize="20" HorizontalAlignment="Center">
                                 <ToggleSwitch.RenderTransform>
                                     <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
                                 </ToggleSwitch.RenderTransform>
