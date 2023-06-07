@@ -74,7 +74,7 @@ namespace Windows_App_WinUI3
 
         private void StartServer()
         {
-            server = new NamedPipeServerStream("MyPipe");
+            server = new NamedPipeServerStream("RageQuitPipe");
 
             while (true)
             {
@@ -89,6 +89,15 @@ namespace Windows_App_WinUI3
                     {
                         LaunchAndBringToForegroundIfNeeded();
                     });
+                }
+                else if (message == "quit")
+                {
+                    // Exit the application
+                    _ = m_window.DispatcherQueue.TryEnqueue(() =>
+                    {
+                        Application.Current.Exit();
+                    });
+                    return; // Exit the loop and the method
                 }
 
                 server.Disconnect();
