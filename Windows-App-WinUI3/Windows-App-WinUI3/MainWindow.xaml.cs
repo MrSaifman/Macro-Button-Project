@@ -19,6 +19,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.UI;
+using WinRT.Interop;
 
 // Microsoft namespaces
 using Microsoft.UI;
@@ -31,6 +32,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Interop;
+using Microsoft.UI.Windowing;
 using Microsoft.Win32;
 
 // Project specific namespaces
@@ -57,11 +59,33 @@ namespace Windows_App_WinUI3
         private Button _selectedNavigationButton;
         private Button _currentColorSelectionButton;
 
+        private AppWindow _appWindow;
+
         public MainWindow()
         {
             this.InitializeComponent();
             InitializeManagers();
             InitializeApplication();
+            InitializeOnClose();
+        }
+
+        private void OnClosed(object sender, WindowEventArgs e)
+        {
+            // on closed function
+        }
+
+        private void OnClosing(object sender, AppWindowClosingEventArgs e)
+        {
+            e.Cancel = true;  // Cancel close
+            _appWindow.Hide();  // Hide the window
+        }
+
+
+        private AppWindow GetAppWindowForCurrentWindow()
+        {
+            IntPtr hWnd = WindowNative.GetWindowHandle(this);
+            WindowId myWndId = Win32Interop.GetWindowIdFromWindow(hWnd);
+            return AppWindow.GetFromWindowId(myWndId);
         }
 
         // Initialize managers for JSON and USB device
@@ -95,8 +119,15 @@ namespace Windows_App_WinUI3
             await deviceManager.InitializeDeviceAsync();
         }
 
-        // Update UI based on selected button
-        private void UpdateUIForSelectedButton(Button clickedButton, Microsoft.UI.Xaml.Shapes.Rectangle rect, Grid screen)
+        private void InitializeOnClose()
+        {
+            this.Closed += OnClosed;
+            _appWindow = GetAppWindowForCurrentWindow();
+            _appWindow.Closing += OnClosing;
+        }
+
+            // Update UI based on selected button
+            private void UpdateUIForSelectedButton(Button clickedButton, Microsoft.UI.Xaml.Shapes.Rectangle rect, Grid screen)
         {
             // Remove selection effect from previously selected button
             if (_selectedNavigationButton != null)
