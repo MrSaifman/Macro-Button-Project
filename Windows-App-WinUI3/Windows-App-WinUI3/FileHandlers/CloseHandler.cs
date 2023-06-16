@@ -24,36 +24,41 @@ namespace Windows_App_WinUI3
         public void PrintActiveWindow()
         {
             string activeWindow = GetActiveWindow();
-            if (activeWindow == null)
+            string currentProcess = GetActiveWindowTitle();
+
+            if (activeWindow == null && currentProcess == null)
             {
-                Debug.WriteLine("Active window is null");
+                Debug.WriteLine("Both active window and current process are null");
                 return;
             }
 
-            activeWindow = activeWindow.ToLower().Replace(" ", "");
+            activeWindow = activeWindow?.ToLower().Replace(" ", "");
+            currentProcess = currentProcess?.ToLower().Replace(" ", "");
+
             JsonManager jsonManager = new JsonManager();
             List<Application> blacklist = jsonManager.ReadApplicationList("blacklist.json");
             List<Application> whitelist = jsonManager.ReadApplicationList("whitelist.json");
 
-            if (blacklist.Any(app => activeWindow.Contains(app.Name.ToLower().Replace(" ", "")) || app.Name.ToLower().Replace(" ", "").Contains(activeWindow)))
+            if (blacklist.Any(app => activeWindow.Contains(app.Name.ToLower().Replace(" ", "")) || app.Name.ToLower().Replace(" ", "").Contains(activeWindow) || currentProcess.Contains(app.Name.ToLower().Replace(" ", "")) || app.Name.ToLower().Replace(" ", "").Contains(currentProcess)))
             {
-                Debug.WriteLine("Active window is in the blacklist");
+                Debug.WriteLine("Active window or current process is in the blacklist");
             }
             else
             {
-                Debug.WriteLine("Active window is not in the blacklist");
+                Debug.WriteLine("Active window and current process are not in the blacklist");
             }
 
-            if (whitelist.Any(app => activeWindow.Contains(app.Name.ToLower().Replace(" ", "")) || app.Name.ToLower().Replace(" ", "").Contains(activeWindow)))
+            if (whitelist.Any(app => activeWindow.Contains(app.Name.ToLower().Replace(" ", "")) || app.Name.ToLower().Replace(" ", "").Contains(activeWindow) || currentProcess.Contains(app.Name.ToLower().Replace(" ", "")) || app.Name.ToLower().Replace(" ", "").Contains(currentProcess)))
             {
-                Debug.WriteLine("Active window is in the whitelist");
+                Debug.WriteLine("Active window or current process is in the whitelist");
             }
             else
             {
-                Debug.WriteLine("Active window is not in the whitelist");
+                Debug.WriteLine("Active window and current process are not in the whitelist");
             }
         }
-        
+
+
         public void ForceCloseActiveWindow()
         {
             IntPtr handle = GetForegroundWindow();
@@ -85,6 +90,20 @@ namespace Windows_App_WinUI3
                 {
                     return process.ProcessName;
                 }
+            }
+
+            return null;
+        }
+
+        public string GetActiveWindowTitle()
+        {
+            const int nChars = 256;
+            StringBuilder Buff = new StringBuilder(nChars);
+            IntPtr handle = GetForegroundWindow();
+
+            if (GetWindowText(handle, Buff, nChars) > 0)
+            {
+                return Buff.ToString();
             }
 
             return null;
