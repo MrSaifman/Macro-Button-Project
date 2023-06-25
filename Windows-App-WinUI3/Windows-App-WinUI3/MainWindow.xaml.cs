@@ -161,11 +161,12 @@ namespace Windows_App_WinUI3
             RageModeScreen.Visibility = Visibility.Collapsed;
             MacroModeScreen.Visibility = Visibility.Collapsed;
             LightingScreen.Visibility = Visibility.Collapsed;
-
             HelpScreen.Visibility = Visibility.Collapsed;
             SettingsScreen.Visibility = Visibility.Collapsed;
 
             screen.Visibility = Visibility.Visible;
+
+
         }
 
 
@@ -175,33 +176,69 @@ namespace Windows_App_WinUI3
         {
             Button clickedButton = sender as Button;
 
+            if (clickedButton == _selectedNavigationButton)
+                return;
+
             // Store the original Background and Foreground
             _originalBackground = clickedButton.Background as SolidColorBrush;
             _originalForeground = clickedButton.Foreground as SolidColorBrush;
 
+            if (_selectedNavigationButton == btnDashboard)
+            {
+                dashboardImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/house.png"));
+            }
+            else if (_selectedNavigationButton == btnRageMode)
+            {
+                rageModeImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/vein_pop.png"));
+            }
+            else if (_selectedNavigationButton == btnMacroMode)
+            {
+                macroModeImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/keyboard_key_f.png"));
+            }
+            else if (_selectedNavigationButton == btnLighting)
+            {
+                lightingImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/lightning.png"));
+            }
+            else if (_selectedNavigationButton == btnHelp)
+            {
+                helpImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/help_square.png"));
+            }
+            else if (_selectedNavigationButton == btnSettings)
+            {
+                settingsImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/gear.png"));
+            }
+
+
+
             if (clickedButton == btnDashboard)
             {
                 UpdateUIForSelectedButton(clickedButton, DashboardScreen);
+                dashboardImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/house_press.png"));
             }
             else if (clickedButton == btnRageMode)
             {
                 UpdateUIForSelectedButton(clickedButton, RageModeScreen);
+                rageModeImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/vein_pop_press.png"));
             }
             else if (clickedButton == btnMacroMode)
             {
                 UpdateUIForSelectedButton(clickedButton, MacroModeScreen);
+                macroModeImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/keyboard_key_f_press.png"));
             }
             else if (clickedButton == btnLighting)
             {
                 UpdateUIForSelectedButton(clickedButton, LightingScreen);
+                lightingImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/lightning_press.png"));
             }
             else if (clickedButton == btnHelp)
             {
                 UpdateUIForSelectedButton(clickedButton, HelpScreen);
+                helpImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/help_square_press.png"));
             }
             else if (clickedButton == btnSettings)
             {
                 UpdateUIForSelectedButton(clickedButton, SettingsScreen);
+                settingsImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/gear_press.png"));
             }
         }
 
@@ -258,7 +295,7 @@ namespace Windows_App_WinUI3
                 _originalForegrounds[hoveredButton] = hoveredButton.Foreground as SolidColorBrush;
             }
 
-            // If the hovered button is not the currently selected button, change the text color
+            // If the hovered button is not the currently selected button, change the text color #a1a1a1
             if (hoveredButton != _selectedNavigationButton)
             {
                 hoveredButton.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xff, 0xa1, 0xa1, 0xa1));
@@ -267,6 +304,34 @@ namespace Windows_App_WinUI3
             {
                 // If the hovered button is the currently selected button, keep the text color as #141415
                 hoveredButton.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xff, 0x14, 0x14, 0x15));
+            }
+
+            if (hoveredButton != _selectedNavigationButton)
+            {
+                if (hoveredButton == btnDashboard)
+                {
+                    dashboardImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/house_hover.png"));
+                }
+                else if (hoveredButton == btnRageMode)
+                {
+                    rageModeImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/vein_pop_hover.png"));
+                }
+                else if (hoveredButton == btnMacroMode)
+                {
+                    macroModeImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/keyboard_key_f_hover.png"));
+                }
+                else if (hoveredButton == btnLighting)
+                {
+                    lightingImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/lightning_hover.png"));
+                }
+                else if (hoveredButton == btnHelp)
+                {
+                    helpImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/help_square_hover.png"));
+                }
+                else if (hoveredButton == btnSettings)
+                {
+                    settingsImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/gear_hover.png"));
+                }
             }
         }
 
@@ -279,6 +344,34 @@ namespace Windows_App_WinUI3
             {
                 exitedButton.Foreground = new SolidColorBrush(Colors.White);
             }
+
+            if(exitedButton != _selectedNavigationButton)
+            {
+                if (exitedButton == btnDashboard)
+                {
+                    dashboardImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/house.png"));
+                }
+                else if (exitedButton == btnRageMode)
+                {
+                    rageModeImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/vein_pop.png"));
+                }
+                else if (exitedButton == btnMacroMode)
+                {
+                    macroModeImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/keyboard_key_f.png"));
+                }
+                else if (exitedButton == btnLighting)
+                {
+                    lightingImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/lightning.png"));
+                }
+                else if (exitedButton == btnHelp)
+                {
+                    helpImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/help_square.png"));
+                }
+                else if (exitedButton == btnSettings)
+                {
+                    settingsImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/gear.png"));
+                }
+            }   
         }
 
 
