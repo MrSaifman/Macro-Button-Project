@@ -40,20 +40,68 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Rectangle x:Name="rectDashboard" Grid.Row="0" Grid.Column="0" Fill="#ff6b27" Width="8" Height="30" RadiusX="5" RadiusY="5" Margin="0,10,0,10" Opacity="0"/>
-                <Button x:Name="btnDashboard" Content="Dashboard" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" Grid.Row="0" Grid.Column="1" FontSize="22"/>
-                <Rectangle x:Name="rectRageMode" Grid.Row="1" Grid.Column="0" Fill="#ff6b27" Width="8" Height="30" RadiusX="5" RadiusY="5" Margin="0,10,0,10" Opacity="0"/>
-                <Button x:Name="btnRageMode" Content="Rage Mode" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" Grid.Row="1" Grid.Column="1" FontSize="22"/>
-                <Rectangle x:Name="rectMacroMode" Grid.Row="2" Grid.Column="0" Fill="#ff6b27" Width="8" Height="30" RadiusX="5" RadiusY="5" Margin="0,10,0,10" Opacity="0"/>
-                <Button x:Name="btnMacroMode" Content="Macro Mode" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" Grid.Row="2" Grid.Column="1" FontSize="22"/>
-                <Rectangle x:Name="rectLighting" Grid.Row="3" Grid.Column="0" Fill="#ff6b27" Width="8" Height="30" RadiusX="5" RadiusY="5" Margin="0,10,0,10" Opacity="0"/>
-                <Button x:Name="btnLighting" Content="Lighting" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" Grid.Row="3" Grid.Column="1" FontSize="22"/>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition Height="60"/>
+                    </Grid.RowDefinitions>
+                    <Grid x:Name="gridDashboard" Background="Transparent" Grid.Row="0" CornerRadius="10">
+                        <StackPanel Orientation="Horizontal">
+                            <Canvas>
+                                <Image Canvas.Left="10" Canvas.Top="10" Source="Assets/house.png" Height="27" Width="27" Margin="10,5,0,0"/>
+                            </Canvas>
+                            <Button x:Name="btnDashboard" Content="Dashboard" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" FontSize="22"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid x:Name="gridRageMode" Background="Transparent" Grid.Row="1" CornerRadius="10">
+                        <StackPanel Orientation="Horizontal">
+                            <Canvas>
+                                <Image Canvas.Left="10" Canvas.Top="10" Source="Assets/vein_pop.png" Height="27" Width="27" Margin="10,5,0,0"/>
+                            </Canvas>
+                            <Button x:Name="btnRageMode" Content="Rage Mode" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" FontSize="22"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid x:Name="gridMacroMode" Background="Transparent" Grid.Row="2" CornerRadius="10">
+                        <StackPanel Orientation="Horizontal">
+                            <Canvas>
+                                <Image Canvas.Left="10" Canvas.Top="10" Source="Assets/keyboard_key_f.png" Height="27" Width="27" Margin="10,5,0,0"/>
+                            </Canvas>
+                            <Button x:Name="btnMacroMode" Content="Macro Mode" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" FontSize="22"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid x:Name="gridLighting" Background="Transparent" Grid.Row="3" CornerRadius="10">
+                        <StackPanel Orientation="Horizontal">
+                            <Canvas>
+                                <Image Canvas.Left="10" Canvas.Top="10" Source="Assets/lightning.png" Height="27" Width="27" Margin="10,5,0,0"/>
+                            </Canvas>
+                            <Button x:Name="btnLighting" Content="Lighting" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" FontSize="22"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid x:Name="gridHelp" Background="Transparent" Grid.Row="4" CornerRadius="10">
+                        <StackPanel Orientation="Horizontal">
+                            <Canvas>
+                                <Image Canvas.Left="10" Canvas.Top="10" Source="Assets/help_square.png" Height="27" Width="27" Margin="10,5,0,0"/>
+                            </Canvas>
+                            <Button x:Name="btnHelp" Content="Help" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" FontSize="22"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid x:Name="gridSettings" Background="Transparent" Grid.Row="5" CornerRadius="10">
+                        <StackPanel Orientation="Horizontal">
+                            <Canvas>
+                                <Image Canvas.Left="10" Canvas.Top="10" Source="Assets/gear.png" Height="27" Width="27" Margin="10,5,0,0"/>
+                            </Canvas>
+                            <Button x:Name="btnSettings" Content="Settings" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" FontSize="22"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
 
 
-                <Rectangle x:Name="rectHelp" Grid.Row="4" Grid.Column="0" Fill="#ff6b27" Width="8" Height="30" RadiusX="5" RadiusY="5" Margin="0,10,0,10" Opacity="0"/>
-                <Button x:Name="btnHelp" Content="Help" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" Grid.Row="4" Grid.Column="1" FontSize="22"/>
-                <Rectangle x:Name="rectSettingsg" Grid.Row="5" Grid.Column="0" Fill="#ff6b27" Width="8" Height="30" RadiusX="5" RadiusY="5" Margin="0,10,0,10" Opacity="0"/>
-                <Button x:Name="btnSettings" Content="Settings" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click" PointerEntered="NavButton_PointerEntered" PointerExited="NavButton_PointerExited" Margin="10,10,0,10" Grid.Row="5" Grid.Column="1" FontSize="22"/>
+
             </Grid>
 
             <Grid x:Name="DashboardScreen" Grid.Column="1" Background="White" Width="Auto" Height="Auto" Margin="120,40,40,40">
@@ -319,6 +367,18 @@
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         </StackPanel>
                     </Grid>
+                </Grid>
+            </Grid>
+
+            <Grid x:Name="HelpScreen" Grid.Column="1" Background="Yellow" Width="Auto" Height="Auto" Margin="120,40,40,40" Visibility="Collapsed">
+                <Grid Grid.Column="1" Background="Red" Width="Auto" Height="Auto" Margin="120,40,40,40" CornerRadius="20">
+                    
+                </Grid>
+            </Grid>
+
+            <Grid x:Name="SettingsScreen" Grid.Column="1" Background="Pink" Width="Auto" Height="Auto" Margin="120,40,40,40" Visibility="Collapsed">
+                <Grid Grid.Column="1" Background="Red" Width="Auto" Height="Auto" Margin="120,40,40,40" CornerRadius="20">
+                    
                 </Grid>
             </Grid>
         </Grid>

@@ -61,6 +61,12 @@ namespace Windows_App_WinUI3
 
         private AppWindow _appWindow;
 
+        private SolidColorBrush _originalBackground;
+        private SolidColorBrush _originalForeground;
+
+        private Dictionary<Button, SolidColorBrush> _originalBackgrounds = new Dictionary<Button, SolidColorBrush>();
+        private Dictionary<Button, SolidColorBrush> _originalForegrounds = new Dictionary<Button, SolidColorBrush>();
+
         public MainWindow()
         {
             this.InitializeComponent();
@@ -126,25 +132,29 @@ namespace Windows_App_WinUI3
             _appWindow.Closing += OnClosing;
         }
 
-            // Update UI based on selected button
-            private void UpdateUIForSelectedButton(Button clickedButton, Microsoft.UI.Xaml.Shapes.Rectangle rect, Grid screen)
+        // Update UI based on selected button
+        private void UpdateUIForSelectedButton(Button clickedButton, Grid screen)
         {
             // Remove selection effect from previously selected button
             if (_selectedNavigationButton != null)
             {
-                _selectedNavigationButton.BorderBrush = new SolidColorBrush(Colors.Transparent);
-                _selectedNavigationButton.Foreground = new SolidColorBrush(Colors.White);
-                _selectedNavigationButton.BorderThickness = new Thickness(0);
+                _selectedNavigationButton.Background = _originalBackgrounds[_selectedNavigationButton];
+                _selectedNavigationButton.Foreground = _originalForegrounds[_selectedNavigationButton];
+                // Also reset the background color of the Grid that contains the previously selected button
+                // Also change the background color of the Grid that contains the selected button
+                ((Grid)((FrameworkElement)_selectedNavigationButton.Parent).Parent).Background = new SolidColorBrush(Colors.Transparent);
+
             }
 
             // Set the clicked button as the selected button
             _selectedNavigationButton = clickedButton;
 
-            // Reset all rectangles' opacity
-            rectDashboard.Opacity = 0;
-            rectRageMode.Opacity = 0;
-            rectMacroMode.Opacity = 0;
-            rectLighting.Opacity = 0;
+            // Change the background and text color of the selected button
+            _selectedNavigationButton.Background = new SolidColorBrush(Colors.Transparent); // Transparent
+            _selectedNavigationButton.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xff, 0x14, 0x14, 0x15)); // #141415
+
+            // Also change the background color of the Grid that contains the selected button
+            ((Grid)((FrameworkElement)_selectedNavigationButton.Parent).Parent).Background = new SolidColorBrush(Colors.White);
 
             // Reset all screens' visibility
             DashboardScreen.Visibility = Visibility.Collapsed;
@@ -152,32 +162,72 @@ namespace Windows_App_WinUI3
             MacroModeScreen.Visibility = Visibility.Collapsed;
             LightingScreen.Visibility = Visibility.Collapsed;
 
-            // Set the selected rectangle's opacity and screen's visibility
-            rect.Opacity = 1;
+            HelpScreen.Visibility = Visibility.Collapsed;
+            SettingsScreen.Visibility = Visibility.Collapsed;
+
             screen.Visibility = Visibility.Visible;
         }
+
+
+
 
         private void NavButton_Click(object sender, RoutedEventArgs e)
         {
             Button clickedButton = sender as Button;
 
+            // Store the original Background and Foreground
+            _originalBackground = clickedButton.Background as SolidColorBrush;
+            _originalForeground = clickedButton.Foreground as SolidColorBrush;
+
             if (clickedButton == btnDashboard)
             {
-                UpdateUIForSelectedButton(clickedButton, rectDashboard, DashboardScreen);
+                UpdateUIForSelectedButton(clickedButton, DashboardScreen);
             }
             else if (clickedButton == btnRageMode)
             {
-                UpdateUIForSelectedButton(clickedButton, rectRageMode, RageModeScreen);
+                UpdateUIForSelectedButton(clickedButton, RageModeScreen);
             }
             else if (clickedButton == btnMacroMode)
             {
-                UpdateUIForSelectedButton(clickedButton, rectMacroMode, MacroModeScreen);
+                UpdateUIForSelectedButton(clickedButton, MacroModeScreen);
             }
             else if (clickedButton == btnLighting)
             {
-                UpdateUIForSelectedButton(clickedButton, rectLighting, LightingScreen);
+                UpdateUIForSelectedButton(clickedButton, LightingScreen);
+            }
+            else if (clickedButton == btnHelp)
+            {
+                UpdateUIForSelectedButton(clickedButton, HelpScreen);
+            }
+            else if (clickedButton == btnSettings)
+            {
+                UpdateUIForSelectedButton(clickedButton, SettingsScreen);
             }
         }
+
+        private void NavButton_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            Button pressedButton = sender as Button;
+
+            // If the pressed button is not the currently selected button, change the text color
+            if (pressedButton != _selectedNavigationButton)
+            {
+                VisualStateManager.GoToState(pressedButton, "Pressed", true);
+            }
+        }
+
+        private void NavButton_PointerReleased(object sender, PointerRoutedEventArgs e)
+        {
+            Button releasedButton = sender as Button;
+
+            // If the released button is not the currently selected button, change the text color
+            if (releasedButton != _selectedNavigationButton)
+            {
+                VisualStateManager.GoToState(releasedButton, "Released", true);
+            }
+        }
+
+
 
         private void FocusedAppToggleSwitch_Toggled(object sender, RoutedEventArgs e)
         {
@@ -198,23 +248,39 @@ namespace Windows_App_WinUI3
         {
             Button hoveredButton = sender as Button;
 
-            // Change the button text color to orange if it's not the selected button
-            if (_selectedNavigationButton != hoveredButton)
+            // Store the original Background and Foreground for each button
+            if (!_originalBackgrounds.ContainsKey(hoveredButton))
             {
-                hoveredButton.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xff, 0xff, 0x6b, 0x27));
+                _originalBackgrounds[hoveredButton] = hoveredButton.Background as SolidColorBrush;
+            }
+            if (!_originalForegrounds.ContainsKey(hoveredButton))
+            {
+                _originalForegrounds[hoveredButton] = hoveredButton.Foreground as SolidColorBrush;
+            }
+
+            // If the hovered button is not the currently selected button, change the text color
+            if (hoveredButton != _selectedNavigationButton)
+            {
+                hoveredButton.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xff, 0xa1, 0xa1, 0xa1));
+            }
+            else
+            {
+                // If the hovered button is the currently selected button, keep the text color as #141415
+                hoveredButton.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xff, 0x14, 0x14, 0x15));
             }
         }
 
         private void NavButton_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            Button hoveredButton = sender as Button;
+            Button exitedButton = sender as Button;
 
-            // Change the button text color to white if it's not the selected button
-            if (_selectedNavigationButton != hoveredButton)
+            // If the exited button is not the currently selected button, change the text color back to white
+            if (exitedButton != _selectedNavigationButton)
             {
-                hoveredButton.Foreground = new SolidColorBrush(Colors.White);
+                exitedButton.Foreground = new SolidColorBrush(Colors.White);
             }
         }
+
 
         private void InstalledProgramsButton_Click(object sender, RoutedEventArgs e)
         {
