@@ -49,5 +49,18 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style x:Key="UnderlinedButtonStyle" TargetType="Button">
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontFamily" Value="Outfit"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,10,0,10"/>
+        <Setter Property="Width" Value="220"/>
+        <Setter Property="Height" Value="35"/>
+    </Style>
+
 </ResourceDictionary>
 

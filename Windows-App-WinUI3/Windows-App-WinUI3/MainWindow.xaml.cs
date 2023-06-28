@@ -878,19 +878,35 @@ namespace Windows_App_WinUI3
                 default: return 0x00; // Default case if no match
             }
         }
-        
+
         private void LightingModeChange(object sender, RoutedEventArgs e)
         {
-            // Reset all buttons to black
-            Button1.Background = new SolidColorBrush(Colors.Black);
-            Button2.Background = new SolidColorBrush(Colors.Black);
-            Button3.Background = new SolidColorBrush(Colors.Black);
+            // Reset all buttons to black and hide all underlines
+            Button1.Foreground = new SolidColorBrush(Colors.White);
+            Underline1.Visibility = Visibility.Collapsed;
 
-            // Change the clicked button to orange
+            Button2.Foreground = new SolidColorBrush(Colors.White);
+            Underline2.Visibility = Visibility.Collapsed;
+
+            Button3.Foreground = new SolidColorBrush(Colors.White);
+            Underline3.Visibility = Visibility.Collapsed;
+
+            // Change the clicked button to orange and show the underline
             Button button = sender as Button;
             if (button != null)
             {
-                button.Background = new SolidColorBrush(Colors.Orange);
+                if (button == Button1)
+                {
+                    Underline1.Visibility = Visibility.Visible;
+                }
+                else if (button == Button2)
+                {
+                    Underline2.Visibility = Visibility.Visible;
+                }
+                else if (button == Button3)
+                {
+                    Underline3.Visibility = Visibility.Visible;
+                }
 
                 if (jsonManager.lightingModeMapping.TryGetValue(button.Content.ToString(), out string mode))
                 {
@@ -899,6 +915,25 @@ namespace Windows_App_WinUI3
                 }
             }
         }
+
+        private void Button_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            if (button != null)
+            {
+                button.Foreground = new SolidColorBrush(Colors.Gray);
+            }
+        }
+
+        private void Button_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            if (button != null && jsonManager.currentLightingMode != button.Content.ToString())
+            {
+                button.Foreground = new SolidColorBrush(Colors.White);
+            }
+        }
+
 
         public async void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
