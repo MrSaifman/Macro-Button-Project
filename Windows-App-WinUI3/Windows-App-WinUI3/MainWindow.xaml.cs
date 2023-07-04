@@ -62,7 +62,6 @@ namespace Windows_App_WinUI3
         private const string ButtonColor1 = "ButtonColor1";
         private const string FrameColor2 = "FrameColor2";
         private const string ButtonColor2 = "ButtonColor2";
-        private string currentColorSet;
         private Button _lastClickedButton;
 
         private JsonManager jsonManager;
@@ -582,7 +581,7 @@ namespace Windows_App_WinUI3
         {
             if (currentLightingMode != null)
             {
-                byte reportValue = GetReportForTag((string)currentColorSet);
+                byte reportValue = GetReportForTag((string)_lastClickedButton.Tag);
 
                 // Construct the report data
                 byte[] reportData = new byte[]
