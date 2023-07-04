@@ -7,15 +7,6 @@ namespace Windows_App_WinUI3.FileHandlers
 {
     public class JsonManager
     {
-        // Variable to keep track of current lighting mode
-        public string currentLightingMode;
-        public string LightUpPattern;
-        public string Brightness;
-        public string FrameColor1;
-        public string FrameColor2;
-        public string ButtonColor1;
-        public string ButtonColor2;
-
         // Create a dictionary to map button content to lighting modes
         public Dictionary<string, string> lightingModeMapping = new Dictionary<string, string>
         {

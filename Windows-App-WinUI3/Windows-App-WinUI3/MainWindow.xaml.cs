@@ -49,15 +49,25 @@ namespace Windows_App_WinUI3
         private const string BlacklistJson = "blacklist.json";
         private const string WhitelistJson = "whitelist.json";
         private const string TempIconFolder  = "TempIcons";
-
         private const string AppSettings = "AppSettings";
         private const string FocusedAppOnly = "FocusedAppOnly";
+
+        // Variable to keep track of current lighting mode
         private const string IdleLighting = "IdleLighting";
+        private const string LidLiftLighting = "LidLiftLighting";
+        private const string ButtonPressLighting = "ButtonPressLighting";  
+        private string currentLightingMode;
+
+        private const string FrameColor1 = "FrameColor1";
+        private const string ButtonColor1 = "ButtonColor1";
+        private const string FrameColor2 = "FrameColor2";
+        private const string ButtonColor2 = "ButtonColor2";
+        private string currentColorSet;
+        private Button _lastClickedButton;
 
         private JsonManager jsonManager;
         private USBDeviceManager deviceManager;
         private Button _selectedNavigationButton;
-        private Button _currentColorSelectionButton;
 
         private AppWindow _appWindow;
 
@@ -102,7 +112,7 @@ namespace Windows_App_WinUI3
 
             jsonManager = new JsonManager();
             jsonManager.EnsureDefaultSettingsExist();
-            jsonManager.currentLightingMode = IdleLighting;
+            currentLightingMode = IdleLighting;
         }
 
         // Initialize application with json settings
@@ -110,6 +120,8 @@ namespace Windows_App_WinUI3
         {
             PopulateProgramsListBox();
             PopulateBlackAndWhiteLists();
+
+            Underline1.Visibility = Visibility.Visible;
             PopulateLightSettings(IdleLighting);
 
             string focusedAppOnlySetting = jsonManager.ReadSetting(AppSettings, FocusedAppOnly);
@@ -163,14 +175,8 @@ namespace Windows_App_WinUI3
             LightingScreen.Visibility = Visibility.Collapsed;
             HelpScreen.Visibility = Visibility.Collapsed;
             SettingsScreen.Visibility = Visibility.Collapsed;
-
             screen.Visibility = Visibility.Visible;
-
-
         }
-
-
-
 
         private void NavButton_Click(object sender, RoutedEventArgs e)
         {
@@ -535,19 +541,48 @@ namespace Windows_App_WinUI3
 
         private void ColorButton_Click(object sender, RoutedEventArgs e)
         {
-            _currentColorSelectionButton = (Button)sender;
-            ColorPickerControl.Color = ((SolidColorBrush)_currentColorSelectionButton.Background).Color;
+            if (_lastClickedButton != null)
+            {
+                _lastClickedButton.Background = new SolidColorBrush(Colors.Transparent);
+                _lastClickedButton.Foreground = new SolidColorBrush(Colors.White);
+            }
+
+            var button = (Button)sender;
+            button.Background = new SolidColorBrush(Colors.White);
+            button.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xff, 0x14, 0x14, 0x15)); // #141415
+            _lastClickedButton = button;
+
+            // Unsubscribe from the ColorChanged event before changing the color
+            ColorPickerControl.ColorChanged -= ColorPickerControl_ColorChanged;
+
+            ColorPickerControl.Color = ConvertStringToColor(jsonManager.ReadSetting(currentLightingMode, (string)button.Tag));
+
+            // Resubscribe to the ColorChanged event after changing the color
             ColorPickerControl.ColorChanged += ColorPickerControl_ColorChanged;
-            ColorPickerControl.Visibility = Visibility.Visible;
         }
-        
+
+        private void Button_PointerEntered1(object sender, PointerRoutedEventArgs e)
+        {
+            var button = (Button)sender;
+            button.Background = new SolidColorBrush(Colors.White);
+            button.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xff, 0x14, 0x14, 0x15)); // #141415
+        }
+
+        private void Button_PointerExited1(object sender, PointerRoutedEventArgs e)
+        {
+            var button = (Button)sender;
+            if (button != _lastClickedButton)
+            {
+                button.Background = new SolidColorBrush(Colors.Transparent);
+                button.Foreground = new SolidColorBrush(Colors.White);
+            }
+        }
+
         private async void ColorPickerControl_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
         {
-            if (_currentColorSelectionButton != null)
+            if (currentLightingMode != null)
             {
-                _currentColorSelectionButton.Background = new SolidColorBrush(sender.Color);
-
-                byte reportValue = GetReportForTag((string)_currentColorSelectionButton.Tag);
+                byte reportValue = GetReportForTag((string)currentColorSet);
 
                 // Construct the report data
                 byte[] reportData = new byte[]
@@ -560,20 +595,22 @@ namespace Windows_App_WinUI3
 
                 await deviceManager.ReadWriteToHidDevice(reportData);
 
+                jsonManager.UpdateSetting(currentLightingMode, (string)_lastClickedButton.Tag, ColorPickerControl.Color.ToString());
+
             }
         }
         
-        private void ColorPickerControl_LostFocus(object sender, RoutedEventArgs e)
-        {
-            ColorPickerControl.Visibility = Visibility.Collapsed;
-            ColorPickerControl.ColorChanged -= ColorPickerControl_ColorChanged;
-            // Update setting in JSON file
-            if (_currentColorSelectionButton != null)
-            {
-                string settingName = _currentColorSelectionButton.Tag.ToString();
-                jsonManager.UpdateSetting(jsonManager.currentLightingMode, settingName, ColorPickerControl.Color.ToString());
-            }
-        }
+        // private void ColorPickerControl_LostFocus(object sender, RoutedEventArgs e)
+        // {
+        //     ColorPickerControl.Visibility = Visibility.Collapsed;
+        //     ColorPickerControl.ColorChanged -= ColorPickerControl_ColorChanged;
+        //     // Update setting in JSON file
+        //     if (_currentColorSelectionButton != null)
+        //     {
+        //         string settingName = _currentColorSelectionButton.Tag.ToString();
+        //         jsonManager.UpdateSetting(jsonManager.currentLightingMode, settingName, ColorPickerControl.Color.ToString());
+        //     }
+        // }
 
         public async void Slider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
@@ -588,7 +625,7 @@ namespace Windows_App_WinUI3
 
             string settingName = (string)slider.Tag;
 
-            jsonManager.UpdateSetting(jsonManager.currentLightingMode, settingName, value.ToString());
+            jsonManager.UpdateSetting(currentLightingMode, settingName, value.ToString());
 
             byte[] reportData;
             if (settingName == "Brightness")
@@ -809,10 +846,6 @@ namespace Windows_App_WinUI3
             var lightUpPattern = jsonManager.ReadSetting(lightingCategory, "LightUpPattern");
             var brightness = int.Parse(jsonManager.ReadSetting(lightingCategory, "Brightness"));
             var patternSpeed = int.Parse(jsonManager.ReadSetting(lightingCategory, "PatternSpeed"));
-            var frameColor1 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "FrameColor1"));
-            var frameColor2 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "FrameColor2"));
-            var buttonColor1 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "ButtonColor1"));
-            var buttonColor2 = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, "ButtonColor2"));
 
             // Assign these values to the corresponding controls
             foreach (ComboBoxItem item in lightUpPatternComboBox.Items)
@@ -842,10 +875,26 @@ namespace Windows_App_WinUI3
             brightnessSlider.ValueChanged += Slider_ValueChanged;
             patternSlider.ValueChanged += Slider_ValueChanged;
 
-            FrameColorButton1.Background = new SolidColorBrush(frameColor1);
-            FrameColorButton2.Background = new SolidColorBrush(frameColor2);
-            ButtonColorButton1.Background = new SolidColorBrush(buttonColor1);
-            ButtonColorButton2.Background = new SolidColorBrush(buttonColor2);
+            if (_lastClickedButton != null)
+            {
+                _lastClickedButton.Background = new SolidColorBrush(Colors.Transparent);
+                _lastClickedButton.Foreground = new SolidColorBrush(Colors.White);
+            }
+
+            FrameColor1_Btn.Background = new SolidColorBrush(Colors.White);
+            FrameColor1_Btn.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xff, 0x14, 0x14, 0x15)); // #141415
+            _lastClickedButton = (Button)FrameColor1_Btn;
+
+            // Unsubscribe from the ColorChanged event before changing the color
+            ColorPickerControl.ColorChanged -= ColorPickerControl_ColorChanged;
+
+            ColorPickerControl.Color = ConvertStringToColor(jsonManager.ReadSetting(lightingCategory, (string)FrameColor1_Btn.Tag));
+
+            // Resubscribe to the ColorChanged event after changing the color
+            ColorPickerControl.ColorChanged += ColorPickerControl_ColorChanged;
+
+            //FrameColor1_Btn.Background = new SolidColorBrush(Colors.White);
+            //FrameColor1_Btn.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xff, 0x14, 0x14, 0x15)); // #141415
         }
 
         private void ProcessKeyForRunningPrograms(ObservableCollection<AppInformation> programs)
@@ -871,10 +920,10 @@ namespace Windows_App_WinUI3
         {
             switch (tag)
             {
-                case "FrameColor1": return 0x03;
-                case "FrameColor2": return 0x04;
-                case "ButtonColor1": return 0x05;
-                case "ButtonColor2": return 0x06;
+                case FrameColor1: return 0x03;
+                case FrameColor2: return 0x04;
+                case ButtonColor1: return 0x05;
+                case ButtonColor2: return 0x06;
                 default: return 0x00; // Default case if no match
             }
         }
@@ -890,6 +939,8 @@ namespace Windows_App_WinUI3
 
             Button3.Foreground = new SolidColorBrush(Colors.White);
             Underline3.Visibility = Visibility.Collapsed;
+
+            
 
             // Change the clicked button to orange and show the underline
             Button button = sender as Button;
@@ -911,7 +962,7 @@ namespace Windows_App_WinUI3
                 if (jsonManager.lightingModeMapping.TryGetValue(button.Content.ToString(), out string mode))
                 {
                     PopulateLightSettings(mode);
-                    jsonManager.currentLightingMode = mode;
+                    currentLightingMode = mode;
                 }
             }
         }
@@ -928,7 +979,7 @@ namespace Windows_App_WinUI3
         private void Button_PointerExited(object sender, PointerRoutedEventArgs e)
         {
             Button button = sender as Button;
-            if (button != null && jsonManager.currentLightingMode != button.Content.ToString())
+            if (button != null && currentLightingMode != button.Content.ToString())
             {
                 button.Foreground = new SolidColorBrush(Colors.White);
             }
@@ -947,8 +998,7 @@ namespace Windows_App_WinUI3
             ComboBoxItem selectedItem = (ComboBoxItem)comboBox.SelectedItem;
             string selectedPattern = (string)selectedItem.Content;
 
-            jsonManager.LightUpPattern = selectedPattern;
-            jsonManager.UpdateSetting(jsonManager.currentLightingMode, "LightUpPattern", selectedPattern);
+            jsonManager.UpdateSetting(currentLightingMode, "LightUpPattern", selectedPattern);
 
             byte patternValue = ConvertPatternToByte(selectedPattern);
 
@@ -960,23 +1010,34 @@ namespace Windows_App_WinUI3
             await deviceManager.ReadWriteToHidDevice(reportData);
         }
 
+        /// <summary>
+        /// Converts a pattern string to a numeric value representing the pattern for the USB.
+        /// </summary>
+        /// <param name="pattern">The pattern string.</param>
+        /// <returns>The corresponding byte value representing the pattern.</returns>
         private byte ConvertPatternToByte(string pattern)
         {
             switch (pattern)
             {
-                case "None": return 0;
-                case "Static": return 1;
-                case "Wipe": return 2;
-                case "Ease In": return 3;
-                case "Ease Between": return 4;
-                case "Blink Between": return 5;
-                case "Rainbow Cycle": return 6;
-                default: return 0; // Default case if no match
+                case "None": return 0;  // If pattern is "None", return 0
+                case "Static": return 1;  // If pattern is "Static", return 1
+                case "Wipe": return 2;  // If pattern is "Wipe", return 2
+                case "Ease In": return 3;  // If pattern is "Ease In", return 3
+                case "Ease Between": return 4;  // If pattern is "Ease Between", return 4
+                case "Blink Between": return 5;  // If pattern is "Blink Between", return 5
+                case "Rainbow Cycle": return 6;  // If pattern is "Rainbow Cycle", return 6
+                default: return 0;  // If pattern does not match any case, return 0 (default case)
             }
         }
 
+        /// <summary>
+        /// Converts a hex color string to a Windows.UI.Color object.
+        /// </summary>
+        /// <param name="hex">The hex color string in the format "#AARRGGBB".</param>
+        /// <returns>The corresponding Windows.UI.Color object.</returns>
         public static Windows.UI.Color ConvertStringToColor(string hex)
         {
+            // Check if the hex string is null, empty, or has an incorrect length or format
             if (string.IsNullOrEmpty(hex) || hex.Length != 9 || !hex.StartsWith("#"))
             {
                 throw new FormatException("The hex color string is not in the correct format.");
@@ -984,10 +1045,13 @@ namespace Windows_App_WinUI3
 
             hex = hex.Substring(1);  // remove the hashtag
 
+            // Extract the alpha, red, green, and blue components from the hex string
             var a = (byte)(Convert.ToUInt32(hex.Substring(0, 2), 16));
             var r = (byte)(Convert.ToUInt32(hex.Substring(2, 2), 16));
             var g = (byte)(Convert.ToUInt32(hex.Substring(4, 2), 16));
             var b = (byte)(Convert.ToUInt32(hex.Substring(6, 2), 16));
+
+            // Create a Windows.UI.Color object with the extracted components and return it
             return Windows.UI.Color.FromArgb(a, r, g, b);
         }
     }
