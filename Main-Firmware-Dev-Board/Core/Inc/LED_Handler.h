@@ -44,3 +44,4 @@ void updateIdleLightingConfig(LightingPattern pattern, uint8_t brightness, uint8
 void updateButtonPressLightingConfig(LightingPattern pattern, uint8_t brightness, uint8_t patternSpeed, uint32_t frameColor1, uint32_t frameColor2, uint32_t buttonColor1, uint32_t buttonColor2);
 void UpdateLightingConfiguration(LightingConfiguration* config, ReportLightEnum report, uint32_t value);
 void updateBulkLightSettings(uint8_t *report_buffer, uint16_t buffer_length);
+void LightingHandler(void);

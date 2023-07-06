@@ -121,37 +121,41 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
-  {
-    if (flag_rx == 1) 
-    { 
-      //Check if the first byte of the report buffer equals 1 
-      if (report_buffer[0] == REPORT_IDLE_LIGHT) 
-      {
-        uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
-        UpdateLightingConfiguration(&idleLightingConfig, report_buffer[1], theSetting);
-      }
-      else if (report_buffer[0] == REPORT_BUTTON_LIGHT) 
-      {
-        uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
-        UpdateLightingConfiguration(&buttonPressLightingConfig, report_buffer[1], theSetting); 
-      }
-      else if (report_buffer[0] == REPORT_LID_LIFT_LIGHT)
-      {
-        uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
-        UpdateLightingConfiguration(&lidLiftLightingConfig, report_buffer[1], theSetting); 
-      }
-      else if (report_buffer[0] == BULK_SETTINGS_LOAD)
-      {
-        updateBulkLightSettings(report_buffer, sizeof report_buffer);
-      }
-      flag_rx = 0; 
-    } 
+		if (flag_rx == 1) {
+			//Check if the first byte of the report buffer equals 1
+			if (report_buffer[0] == REPORT_IDLE_LIGHT) {
+				uint32_t theSetting = (report_buffer[2] << 16)
+						| (report_buffer[3] << 8) | report_buffer[4];
+				UpdateLightingConfiguration(&idleLightingConfig,
+						report_buffer[1], theSetting);
+			} else if (report_buffer[0] == REPORT_BUTTON_LIGHT) {
+				uint32_t theSetting = (report_buffer[2] << 16)
+						| (report_buffer[3] << 8) | report_buffer[4];
+				UpdateLightingConfiguration(&buttonPressLightingConfig,
+						report_buffer[1], theSetting);
+			} else if (report_buffer[0] == REPORT_LID_LIFT_LIGHT) {
+				uint32_t theSetting = (report_buffer[2] << 16)
+						| (report_buffer[3] << 8) | report_buffer[4];
+				UpdateLightingConfiguration(&lidLiftLightingConfig,
+						report_buffer[1], theSetting);
+			} else if (report_buffer[0] == BULK_SETTINGS_LOAD) {
+				updateBulkLightSettings(report_buffer, sizeof report_buffer);
+			}
+			flag_rx = 0;
+		}
 
-    if(idleLightingConfig.settingChanged == true){
-      idleLightingConfig.settingChanged = false;
-      LP5024_SetColor(LED7, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-    }
-    /* USER CODE END WHILE */
+		if (idleLightingConfig.settingChanged == true) {
+			idleLightingConfig.settingChanged = false;
+			LightingHandler();
+			// LP5024_SetColor(LED7, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
+			// LP5024_SetColor(LED6, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
+			// LP5024_SetColor(LED5, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
+			// LP5024_SetColor(LED4, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
+			// LP5024_SetColor(LED3, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
+			// LP5024_SetColor(LED2, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
+			// LP5024_SetColor(LED1, Adjust_Color_Brightness(idleLightingConfig.buttonColor1, idleLightingConfig.brightness));
+			// LP5024_SetColor(LED0, Adjust_Color_Brightness(idleLightingConfig.buttonColor1, idleLightingConfig.brightness));
+		}
 
     /* USER CODE BEGIN 3 */
     }

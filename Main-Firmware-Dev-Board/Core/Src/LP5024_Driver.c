@@ -33,6 +33,27 @@ void LP5024_SetColor(enum LED_Color_Reg led_register, int hex_color)
     status = HAL_I2C_Master_Transmit(&hi2c1, LP5024_I2C_ADDR_BCST << 1, i2cCmd, sizeof(i2cCmd), HAL_MAX_DELAY);
 }
 
+void LP5024_SetColor_All(int hex_color){
+    HAL_StatusTypeDef status;
+
+    int red = (hex_color >> 16) & 0xFF;
+    int green = (hex_color >> 8) & 0xFF;
+    int blue = hex_color & 0xFF;
+    
+    uint8_t i2cCmd[] = {
+        LED0,
+        red, green, blue,
+        red, green, blue,
+        red, green, blue,
+        red, green, blue,
+        red, green, blue,
+        red, green, blue,
+        red, green, blue,
+        red, green, blue };
+    
+    status = HAL_I2C_Master_Transmit(&hi2c1, LP5024_I2C_ADDR_BCST << 1, i2cCmd, sizeof(i2cCmd), HAL_MAX_DELAY);
+}
+
 void LP5024_SetBrightness(enum LED_Brightness_Reg led_register, int brightness)
 {
     HAL_StatusTypeDef status;

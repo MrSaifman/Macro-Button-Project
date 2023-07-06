@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include "main.h"
 #include "LED_Handler.h"
+#include "LP5024_Driver.h"
 
 #define CATEGORY_SIZE 14
 
@@ -145,4 +146,26 @@ void UpdateLightingConfiguration(LightingConfiguration* config, ReportLightEnum 
   }
   // Indicate that the configuration has changed
   config->settingChanged = true;
+}
+
+void LightingHandler(void)
+{
+  switch(idleLightingConfig.pattern) {
+    case PATTERN_NONE:
+      LP5024_SetColor_All(0);
+      break;
+    case PATTERN_STATIC:
+      LP5024_SetColor(LED7, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
+      LP5024_SetColor(LED6, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
+      LP5024_SetColor(LED5, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
+      LP5024_SetColor(LED4, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
+      LP5024_SetColor(LED3, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
+      LP5024_SetColor(LED2, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
+      LP5024_SetColor(LED1, Adjust_Color_Brightness(idleLightingConfig.buttonColor1, idleLightingConfig.brightness));
+      LP5024_SetColor(LED0, Adjust_Color_Brightness(idleLightingConfig.buttonColor1, idleLightingConfig.brightness));
+      break;
+    default:
+      // Unknown report type
+      break;
+  }
 }
