@@ -310,10 +310,10 @@
                                     <ComboBox x:Name="lightUpPatternComboBox" Width="190" SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Center">
                                         <ComboBoxItem Content="None"/>
                                         <ComboBoxItem Content="Static"/>
-                                        <ComboBoxItem Content="Wipe"/>
+                                        <ComboBoxItem Content="Blink"/>
+                                        <ComboBoxItem Content="Blink Between"/>
                                         <ComboBoxItem Content="Ease In"/>
                                         <ComboBoxItem Content="Ease Between"/>
-                                        <ComboBoxItem Content="Blink Between"/>
                                         <ComboBoxItem Content="Rainbow Cycle"/>
                                     </ComboBox>
                                 </Border>
@@ -345,7 +345,7 @@
                                 </Border>
 
                                 <Border Grid.Row="0" Grid.Column="3">
-                                    <Button  Content="Frame Color 2"  Style="{StaticResource ButtonWithWhiteBorder}" Tag="ButtonColor2" Click="ColorButton_Click" PointerEntered="Button_PointerEntered1" PointerExited="Button_PointerExited1" HorizontalAlignment="Center"/>
+                                    <Button  Content="Button Color 2"  Style="{StaticResource ButtonWithWhiteBorder}" Tag="ButtonColor2" Click="ColorButton_Click" PointerEntered="Button_PointerEntered1" PointerExited="Button_PointerExited1" HorizontalAlignment="Center"/>
                                 </Border>
 
                                 <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Margin="0,20,0,0">

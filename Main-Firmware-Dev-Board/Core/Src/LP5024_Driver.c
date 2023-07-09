@@ -115,3 +115,24 @@ enum LED_Color_Reg LedNum_To_ColorReg(uint8_t led_index) {
             return LEDERR;
     }
 }
+
+void HSVtoRGB(float h, float s, float v, int *r, int *g, int *b)
+{
+    float f, p, q, t;
+    int hi;
+
+    hi = ((int)(h / 60)) % 6;
+    f = h / 60 - hi;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+
+    switch(hi) {
+        case 0: *r = v * 255, *g = t * 255, *b = p * 255; break;
+        case 1: *r = q * 255, *g = v * 255, *b = p * 255; break;
+        case 2: *r = p * 255, *g = v * 255, *b = t * 255; break;
+        case 3: *r = p * 255, *g = q * 255, *b = v * 255; break;
+        case 4: *r = t * 255, *g = p * 255, *b = v * 255; break;
+        case 5: *r = v * 255, *g = p * 255, *b = q * 255; break;
+    }
+}

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
 using Windows.Devices.HumanInterfaceDevice;
@@ -90,15 +91,23 @@ namespace Windows_App_WinUI3
 
         public void DeviceManager_DataReceived(object sender, byte[] data)
         {
-            // This method will be called whenever data is received.
-            // You can process the data here. For example:
+            // Convert byte array to ASCII string
+            string dataString = Encoding.ASCII.GetString(data);
 
-            string dataString = BitConverter.ToString(data);
+            // Trim the null characters from both ends of the string
+            dataString = dataString.Trim('\0');
 
-            // Log the data string or show it in your UI, etc...
             Debug.WriteLine("Data received: " + dataString);
-            closeHandler = new CloseHandler();
-            closeHandler.PrintActiveWindow();
+
+            if (dataString == "btn")
+            {
+                closeHandler = new CloseHandler();
+                closeHandler.PrintActiveWindow();
+            }
+            else if (dataString == "req")
+            {
+                Debug.WriteLine("Requesting Data");
+            }
         }
 
         private void StartDeviceWatcher()

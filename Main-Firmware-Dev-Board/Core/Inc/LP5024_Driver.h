@@ -64,3 +64,4 @@ void LP5024_SetBrightness(enum LED_Brightness_Reg led_register, int brightness);
 void LP5024_GlobalOff(bool off);
 uint32_t Adjust_Color_Brightness(uint32_t color, uint8_t brightness_level);
 enum LED_Color_Reg LedNum_To_ColorReg(uint8_t led_index);
+void HSVtoRGB(float h, float s, float v, int *r, int *g, int *b);

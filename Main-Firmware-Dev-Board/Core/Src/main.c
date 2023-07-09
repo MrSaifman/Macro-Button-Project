@@ -39,6 +39,10 @@
   #define REPORT_BUTTON_LIGHT    0x02
   #define REPORT_LID_LIFT_LIGHT  0x03
   #define BULK_SETTINGS_LOAD     0x04
+
+  #define BTN_PRESS_CMD "btn"
+  #define SETT_REQ_CMD "req"
+  
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -50,15 +54,22 @@
 I2C_HandleTypeDef hi2c1;
 
 TIM_HandleTypeDef htim1;
+TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 uint8_t tx_buffer[64];		//Variable to store the output data 
 uint8_t report_buffer[64];		//Variable to receive the report buffer 
-uint8_t flag = 0;			//Variable to store the button flag 
-uint8_t flag_rx = 0;			//Variable to store the reception flag 
+
 bool state = true;
+volatile uint8_t flag = 0;			//Variable to store the button flag
+volatile bool flag_rx = false;	//Variable to store the reception flag
+volatile bool flag_settingReq = false;
+volatile uint16_t reqSettingCnt = 0;
+volatile bool settingsLoaded = false;
+volatile bool update_led = false;
+
 //extern the USB handler 
 extern USBD_HandleTypeDef hUsbDeviceFS;
 /* USER CODE END PV */
@@ -69,6 +80,7 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_TIM1_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -109,53 +121,57 @@ int main(void)
   MX_I2C1_Init();
   MX_USB_Device_Init();
   MX_TIM1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   LP5024_Init();
-  //To fill the buffer 
-  for (uint8_t i=0; i<64; i++) 
-  { 
-    tx_buffer[i] = i; 
-  } 
+
+  /* Start TIM2 */
+  HAL_TIM_Base_Start_IT(&htim2);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-		if (flag_rx == 1) {
+  while(1)
+  {
+    if(flag_settingReq){
+      tx_buffer[0] = '\0';
+      memcpy(tx_buffer, SETT_REQ_CMD, sizeof(SETT_REQ_CMD));
+      USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, tx_buffer, 64);
+      flag_settingReq = false;
+    }
+
+		if (flag_rx) {
 			//Check if the first byte of the report buffer equals 1
 			if (report_buffer[0] == REPORT_IDLE_LIGHT) {
-				uint32_t theSetting = (report_buffer[2] << 16)
-						| (report_buffer[3] << 8) | report_buffer[4];
-				UpdateLightingConfiguration(&idleLightingConfig,
-						report_buffer[1], theSetting);
+				uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
+				UpdateLightingConfiguration(&idleLightingConfig, report_buffer[1], theSetting);
 			} else if (report_buffer[0] == REPORT_BUTTON_LIGHT) {
-				uint32_t theSetting = (report_buffer[2] << 16)
-						| (report_buffer[3] << 8) | report_buffer[4];
-				UpdateLightingConfiguration(&buttonPressLightingConfig,
-						report_buffer[1], theSetting);
+				uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
+				UpdateLightingConfiguration(&buttonPressLightingConfig, report_buffer[1], theSetting);
 			} else if (report_buffer[0] == REPORT_LID_LIFT_LIGHT) {
-				uint32_t theSetting = (report_buffer[2] << 16)
-						| (report_buffer[3] << 8) | report_buffer[4];
-				UpdateLightingConfiguration(&lidLiftLightingConfig,
-						report_buffer[1], theSetting);
+				uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
+				UpdateLightingConfiguration(&lidLiftLightingConfig, report_buffer[1], theSetting);
 			} else if (report_buffer[0] == BULK_SETTINGS_LOAD) {
 				updateBulkLightSettings(report_buffer, sizeof report_buffer);
+        settingsLoaded = true;
 			}
-			flag_rx = 0;
+			flag_rx = false;
 		}
 
-		if (idleLightingConfig.settingChanged == true) {
-			idleLightingConfig.settingChanged = false;
-			LightingHandler();
-			// LP5024_SetColor(LED7, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-			// LP5024_SetColor(LED6, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-			// LP5024_SetColor(LED5, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-			// LP5024_SetColor(LED4, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-			// LP5024_SetColor(LED3, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-			// LP5024_SetColor(LED2, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-			// LP5024_SetColor(LED1, Adjust_Color_Brightness(idleLightingConfig.buttonColor1, idleLightingConfig.brightness));
-			// LP5024_SetColor(LED0, Adjust_Color_Brightness(idleLightingConfig.buttonColor1, idleLightingConfig.brightness));
+		if (update_led) {
+      LightingHandler();
+
+			// Reset flag
+			update_led = false;
+
+      if(reqSettingCnt > 300)
+      {
+        flag_settingReq = true;
+        reqSettingCnt = 0;
+      }
 		}
+    /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
     }
@@ -299,6 +315,51 @@ static void MX_TIM1_Init(void)
 }
 
 /**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 1599;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 166;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
+}
+
+/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -406,6 +467,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, tx_buffer, 64);
 		state = true;
 		HAL_TIM_Base_Stop_IT(&htim1);
+	}
+  
+	if(htim->Instance == TIM2){
+		// Set flag to update LED
+		update_led = true;
+
+    if(!settingsLoaded)
+      reqSettingCnt++;
 	}
 }
 

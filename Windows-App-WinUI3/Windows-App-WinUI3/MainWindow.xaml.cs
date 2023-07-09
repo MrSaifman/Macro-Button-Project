@@ -1018,13 +1018,13 @@ namespace Windows_App_WinUI3
         {
             switch (pattern)
             {
-                case "None": return 0;  // If pattern is "None", return 0
-                case "Static": return 1;  // If pattern is "Static", return 1
-                case "Wipe": return 2;  // If pattern is "Wipe", return 2
-                case "Ease In": return 3;  // If pattern is "Ease In", return 3
-                case "Ease Between": return 4;  // If pattern is "Ease Between", return 4
-                case "Blink Between": return 5;  // If pattern is "Blink Between", return 5
-                case "Rainbow Cycle": return 6;  // If pattern is "Rainbow Cycle", return 6
+                case "None": return 0;
+                case "Static": return 1;
+                case "Blink": return 2;
+                case "Blink Between": return 3;
+                case "Ease In": return 4;
+                case "Ease Between": return 5;
+                case "Rainbow Cycle": return 6;
                 default: return 0;  // If pattern does not match any case, return 0 (default case)
             }
         }
