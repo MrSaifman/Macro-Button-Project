@@ -31,8 +31,14 @@ namespace Windows_App_WinUI3
         public event Action OnRequestReceived;
         private DeviceWatcher deviceWatcher;
 
+        private bool isInitializing = false;
+
         public async Task InitializeDeviceAsync()
         {
+            if (isInitializing) return;
+
+            isInitializing = true;
+
             string selector = HidDevice.GetDeviceSelector(usagePage, usageId, vendorId, productId);
             var devices = await DeviceInformation.FindAllAsync(selector);
 
@@ -48,6 +54,8 @@ namespace Windows_App_WinUI3
             }
             
             StartDeviceWatcher();
+
+            isInitializing = false;
         }
 
         private void Device_InputReportReceived(HidDevice sender, HidInputReportReceivedEventArgs args)
@@ -114,6 +122,11 @@ namespace Windows_App_WinUI3
 
         private void StartDeviceWatcher()
         {
+            if (deviceWatcher != null && deviceWatcher.Status == DeviceWatcherStatus.Started)
+            {
+                return;
+            }
+
             string selector = HidDevice.GetDeviceSelector(usagePage, usageId, vendorId, productId);
             deviceWatcher = DeviceInformation.CreateWatcher(selector);
 
@@ -136,7 +149,7 @@ namespace Windows_App_WinUI3
 
         private async void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation deviceInfo)
         {
-            if (device == null) // Check if device is already initialized
+            if (device == null && !isInitializing) // Check if device is already initialized or being initialized
             {
                 await InitializeDeviceAsync();
             }
