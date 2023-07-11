@@ -4,7 +4,7 @@
 #include "LED_Handler.h"
 #include "LP5024_Driver.h"
 
-#define CATEGORY_SIZE 14
+#define CATEGORY_SIZE 15
 #define HUE_MAX 360
 #define HUE_STEP 15
 #define SPEED_MIN 0.001f // corresponds to patternSpeed = 0
@@ -286,22 +286,6 @@ void LightingHandler(void)
       break;
 
     case PATTERN_RAINBOW_CYCLE:
-    	// Convert HSV to RGB
-			// HSVtoRGB(hue, 1.0, 1.0, &r, &g, &b); // Assuming full saturation and value
-
-			// // Set LED color
-      // LP5024_SetColor(LED7, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-      // LP5024_SetColor(LED6, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-      // LP5024_SetColor(LED5, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-      // LP5024_SetColor(LED4, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-      // LP5024_SetColor(LED3, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-      // LP5024_SetColor(LED2, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-      // LP5024_SetColor(LED1, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-      // LP5024_SetColor(LED0, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-
-			// // Update hue
-			// hue = (hue + HUE_STEP) % HUE_MAX;
-    
       // Calculate the hue increment based on pattern speed
       hueIncrement = (idleLightingConfig.patternSpeed / 100.0f) * HUE_STEP;
 

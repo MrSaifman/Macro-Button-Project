@@ -108,6 +108,7 @@ namespace Windows_App_WinUI3
         {
             deviceManager = new USBDeviceManager();
             deviceManager.DataReceived += deviceManager.DeviceManager_DataReceived; // Subscribe to the event here
+            deviceManager.OnRequestReceived += BulkSettings_Load; // Subscribe to the event here
 
             jsonManager = new JsonManager();
             jsonManager.EnsureDefaultSettingsExist();
@@ -1052,6 +1053,62 @@ namespace Windows_App_WinUI3
 
             // Create a Windows.UI.Color object with the extracted components and return it
             return Windows.UI.Color.FromArgb(a, r, g, b);
+        }
+
+        private byte[] ConvertStringToColorBytes(string color)
+        {
+            // Parse the color from the string
+            var colorObject = System.Drawing.ColorTranslator.FromHtml(color);
+
+            // Construct a byte array from the color's components
+            byte[] colorBytes = new byte[]
+            {
+                colorObject.R, 
+                colorObject.G, 
+                colorObject.B
+            };
+
+            return colorBytes;
+        }
+
+        private async void BulkSettings_Load()
+        {
+            Debug.WriteLine("BulkSettings_Load invoked.");
+
+            if (jsonManager == null)
+            {
+                // Initialize jsonManager here, or return if it's not supposed to be null at this point.
+                return;
+            }
+
+            List<string> validCategories = new List<string> { IdleLighting, LidLiftLighting, ButtonPressLighting };
+
+            List<byte> reportData = new List<byte>()
+            {
+                0x01, 0x04,
+            };
+
+            foreach (var category in validCategories)
+            {
+                var temp = jsonManager.ReadSetting(category, "LightUpPattern");
+                var lightUpPattern = ConvertPatternToByte(temp);
+                var brightness = byte.Parse(jsonManager.ReadSetting(category, "Brightness"));
+                var patternSpeed = byte.Parse(jsonManager.ReadSetting(category, "PatternSpeed"));
+                var frameColor1 = ConvertStringToColorBytes(jsonManager.ReadSetting(category, "FrameColor1"));
+                var frameColor2 = ConvertStringToColorBytes(jsonManager.ReadSetting(category, "FrameColor2"));
+                var buttonColor1 = ConvertStringToColorBytes(jsonManager.ReadSetting(category, "ButtonColor1"));
+                var buttonColor2 = ConvertStringToColorBytes(jsonManager.ReadSetting(category, "ButtonColor2"));
+
+                reportData.Add(lightUpPattern);
+                reportData.Add(brightness);
+                reportData.Add(patternSpeed);
+                reportData.AddRange(frameColor1);
+                reportData.AddRange(frameColor2);
+                reportData.AddRange(buttonColor1);
+                reportData.AddRange(buttonColor2);
+            }
+
+            await deviceManager.ReadWriteToHidDevice(reportData.ToArray());
         }
     }
 }

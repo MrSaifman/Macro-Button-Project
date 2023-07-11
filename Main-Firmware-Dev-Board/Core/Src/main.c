@@ -165,7 +165,7 @@ int main(void)
 			// Reset flag
 			update_led = false;
 
-      if(reqSettingCnt > 300)
+      if(reqSettingCnt > 180)
       {
         flag_settingReq = true;
         reqSettingCnt = 0;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
@@ -27,6 +28,7 @@ namespace Windows_App_WinUI3
         private HidDevice device;
         
         public event EventHandler<byte[]> DataReceived;
+        public event Action OnRequestReceived;
         private DeviceWatcher deviceWatcher;
 
         public async Task InitializeDeviceAsync()
@@ -106,7 +108,7 @@ namespace Windows_App_WinUI3
             }
             else if (dataString == "req")
             {
-                Debug.WriteLine("Requesting Data");
+                OnRequestReceived?.Invoke();
             }
         }
 
