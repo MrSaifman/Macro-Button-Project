@@ -39,6 +39,7 @@ typedef struct
 extern LightingConfiguration idleLightingConfig;
 extern LightingConfiguration buttonPressLightingConfig;
 extern LightingConfiguration lidLiftLightingConfig;
+extern LightingConfiguration* activeLightingConfig;
 
 void updateIdleLightingConfig(LightingPattern pattern, uint8_t brightness, uint8_t patternSpeed, uint32_t frameColor1, uint32_t frameColor2, uint32_t buttonColor1, uint32_t buttonColor2);
 void updateButtonPressLightingConfig(LightingPattern pattern, uint8_t brightness, uint8_t patternSpeed, uint32_t frameColor1, uint32_t frameColor2, uint32_t buttonColor1, uint32_t buttonColor2);

@@ -14,6 +14,10 @@
 LightingConfiguration idleLightingConfig;
 LightingConfiguration buttonPressLightingConfig;
 LightingConfiguration lidLiftLightingConfig;
+
+// Pointer to the active lighting configuration
+LightingConfiguration* activeLightingConfig = &idleLightingConfig;
+
 bool startupSettingsRecieved = false;
 volatile int hue = 0;
 volatile float t = 0.0f;
@@ -165,42 +169,42 @@ void LightingHandler(void)
   int color1, color2, interpolatedColor;
   float speed, hueIncrement;
 
-  if (idleLightingConfig.settingChanged == true) {
-    idleLightingConfig.settingChanged = false;
+  if (activeLightingConfig->settingChanged == true) {
+    activeLightingConfig->settingChanged = false;
   }
 
-  switch(idleLightingConfig.pattern) {
+  switch(activeLightingConfig->pattern) {
     case PATTERN_NONE:
       LP5024_SetColor_All(0);
       break;
       
     case PATTERN_STATIC:
-      LP5024_SetColor(LED7, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-      LP5024_SetColor(LED6, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-      LP5024_SetColor(LED5, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-      LP5024_SetColor(LED4, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-      LP5024_SetColor(LED3, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-      LP5024_SetColor(LED2, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-      LP5024_SetColor(LED1, Adjust_Color_Brightness(idleLightingConfig.buttonColor1, idleLightingConfig.brightness));
-      LP5024_SetColor(LED0, Adjust_Color_Brightness(idleLightingConfig.buttonColor1, idleLightingConfig.brightness));
+      LP5024_SetColor(LED7, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+      LP5024_SetColor(LED6, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+      LP5024_SetColor(LED5, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+      LP5024_SetColor(LED4, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+      LP5024_SetColor(LED3, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+      LP5024_SetColor(LED2, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+      LP5024_SetColor(LED1, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
+      LP5024_SetColor(LED0, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
       break;
     case PATTERN_BLINK:
       // Update t based on the transition direction
-      speed = SPEED_MIN + (SPEED_MAX - SPEED_MIN) * idleLightingConfig.patternSpeed / 100.0f;
+      speed = SPEED_MIN + (SPEED_MAX - SPEED_MIN) * activeLightingConfig->patternSpeed / 100.0f;
       t += speed * transitionDirection; // Adjust this value to control the speed and direction of the transition
 
       // Check if t reaches the limits and handle accordingly
       if (t > 1.0f) {
         t = 1.0f; // Set t to 1.0f for a smooth transition without blink
         transitionDirection = -1; // Reverse the transition direction
-        LP5024_SetColor(LED7, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-        LP5024_SetColor(LED6, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-        LP5024_SetColor(LED5, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-        LP5024_SetColor(LED4, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-        LP5024_SetColor(LED3, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-        LP5024_SetColor(LED2, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-        LP5024_SetColor(LED1, Adjust_Color_Brightness(idleLightingConfig.buttonColor1, idleLightingConfig.brightness));
-        LP5024_SetColor(LED0, Adjust_Color_Brightness(idleLightingConfig.buttonColor1, idleLightingConfig.brightness));
+        LP5024_SetColor(LED7, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+        LP5024_SetColor(LED6, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+        LP5024_SetColor(LED5, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+        LP5024_SetColor(LED4, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+        LP5024_SetColor(LED3, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+        LP5024_SetColor(LED2, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+        LP5024_SetColor(LED1, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
+        LP5024_SetColor(LED0, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
       } else if (t < 0.0f) {
         t = -t; // Calculate the absolute value of t
         transitionDirection = 1; // Reverse the transition direction
@@ -210,33 +214,33 @@ void LightingHandler(void)
 
     case PATTERN_BLINK_BETWEEN:
       // Update t based on the transition direction
-      speed = SPEED_MIN + (SPEED_MAX - SPEED_MIN) * idleLightingConfig.patternSpeed / 100.0f;
+      speed = SPEED_MIN + (SPEED_MAX - SPEED_MIN) * activeLightingConfig->patternSpeed / 100.0f;
       t += speed * transitionDirection; // Adjust this value to control the speed and direction of the transition
 
       // Check if t reaches the limits and handle accordingly
       if (t > 1.0f) {
         t = 1.0f; // Set t to 1.0f for a smooth transition without blink
         transitionDirection = -1; // Reverse the transition direction
-        LP5024_SetColor(LED7, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-        LP5024_SetColor(LED6, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-        LP5024_SetColor(LED5, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-        LP5024_SetColor(LED4, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-        LP5024_SetColor(LED3, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-        LP5024_SetColor(LED2, Adjust_Color_Brightness(idleLightingConfig.frameColor1, idleLightingConfig.brightness));
-        LP5024_SetColor(LED1, Adjust_Color_Brightness(idleLightingConfig.buttonColor1, idleLightingConfig.brightness));
-        LP5024_SetColor(LED0, Adjust_Color_Brightness(idleLightingConfig.buttonColor1, idleLightingConfig.brightness));
+        LP5024_SetColor(LED7, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+        LP5024_SetColor(LED6, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+        LP5024_SetColor(LED5, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+        LP5024_SetColor(LED4, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+        LP5024_SetColor(LED3, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+        LP5024_SetColor(LED2, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+        LP5024_SetColor(LED1, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
+        LP5024_SetColor(LED0, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
       } else if (t < 0.0f) {
         t = -t; // Calculate the absolute value of t
         transitionDirection = 1; // Reverse the transition direction
 
-        LP5024_SetColor(LED7, Adjust_Color_Brightness(idleLightingConfig.frameColor2, idleLightingConfig.brightness));
-        LP5024_SetColor(LED6, Adjust_Color_Brightness(idleLightingConfig.frameColor2, idleLightingConfig.brightness));
-        LP5024_SetColor(LED5, Adjust_Color_Brightness(idleLightingConfig.frameColor2, idleLightingConfig.brightness));
-        LP5024_SetColor(LED4, Adjust_Color_Brightness(idleLightingConfig.frameColor2, idleLightingConfig.brightness));
-        LP5024_SetColor(LED3, Adjust_Color_Brightness(idleLightingConfig.frameColor2, idleLightingConfig.brightness));
-        LP5024_SetColor(LED2, Adjust_Color_Brightness(idleLightingConfig.frameColor2, idleLightingConfig.brightness));
-        LP5024_SetColor(LED1, Adjust_Color_Brightness(idleLightingConfig.buttonColor2, idleLightingConfig.brightness));
-        LP5024_SetColor(LED0, Adjust_Color_Brightness(idleLightingConfig.buttonColor2, idleLightingConfig.brightness));
+        LP5024_SetColor(LED7, Adjust_Color_Brightness(activeLightingConfig->frameColor2, activeLightingConfig->brightness));
+        LP5024_SetColor(LED6, Adjust_Color_Brightness(activeLightingConfig->frameColor2, activeLightingConfig->brightness));
+        LP5024_SetColor(LED5, Adjust_Color_Brightness(activeLightingConfig->frameColor2, activeLightingConfig->brightness));
+        LP5024_SetColor(LED4, Adjust_Color_Brightness(activeLightingConfig->frameColor2, activeLightingConfig->brightness));
+        LP5024_SetColor(LED3, Adjust_Color_Brightness(activeLightingConfig->frameColor2, activeLightingConfig->brightness));
+        LP5024_SetColor(LED2, Adjust_Color_Brightness(activeLightingConfig->frameColor2, activeLightingConfig->brightness));
+        LP5024_SetColor(LED1, Adjust_Color_Brightness(activeLightingConfig->buttonColor2, activeLightingConfig->brightness));
+        LP5024_SetColor(LED0, Adjust_Color_Brightness(activeLightingConfig->buttonColor2, activeLightingConfig->brightness));
       }
       break;
 
@@ -245,34 +249,34 @@ void LightingHandler(void)
 
     case PATTERN_EASE_BETWEEN:
       // Interpolate between the two colors
-      color1 = idleLightingConfig.frameColor1;
-      color2 = idleLightingConfig.frameColor2;
+      color1 = activeLightingConfig->frameColor1;
+      color2 = activeLightingConfig->frameColor2;
       r = lerp((color1 >> 16) & 0xFF, (color2 >> 16) & 0xFF, t);
       g = lerp((color1 >> 8) & 0xFF, (color2 >> 8) & 0xFF, t);
       b = lerp(color1 & 0xFF, color2 & 0xFF, t);
       interpolatedColor = (r << 16) | (g << 8) | b;
 
-      LP5024_SetColor(LED7, Adjust_Color_Brightness(interpolatedColor, idleLightingConfig.brightness));
-      LP5024_SetColor(LED6, Adjust_Color_Brightness(interpolatedColor, idleLightingConfig.brightness));
-      LP5024_SetColor(LED5, Adjust_Color_Brightness(interpolatedColor, idleLightingConfig.brightness));
-      LP5024_SetColor(LED4, Adjust_Color_Brightness(interpolatedColor, idleLightingConfig.brightness));
-      LP5024_SetColor(LED3, Adjust_Color_Brightness(interpolatedColor, idleLightingConfig.brightness));
-      LP5024_SetColor(LED2, Adjust_Color_Brightness(interpolatedColor, idleLightingConfig.brightness));
+      LP5024_SetColor(LED7, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
+      LP5024_SetColor(LED6, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
+      LP5024_SetColor(LED5, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
+      LP5024_SetColor(LED4, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
+      LP5024_SetColor(LED3, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
+      LP5024_SetColor(LED2, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
 
       // Interpolate between the two button colors
-      color1 = idleLightingConfig.buttonColor1;
-      color2 = idleLightingConfig.buttonColor2;
+      color1 = activeLightingConfig->buttonColor1;
+      color2 = activeLightingConfig->buttonColor2;
       r = lerp((color1 >> 16) & 0xFF, (color2 >> 16) & 0xFF, t);
       g = lerp((color1 >> 8) & 0xFF, (color2 >> 8) & 0xFF, t);
       b = lerp(color1 & 0xFF, color2 & 0xFF, t);
       interpolatedColor = (r << 16) | (g << 8) | b;
 
       // Set LED color
-      LP5024_SetColor(LED1, Adjust_Color_Brightness(interpolatedColor, idleLightingConfig.brightness));
-      LP5024_SetColor(LED0, Adjust_Color_Brightness(interpolatedColor, idleLightingConfig.brightness));
+      LP5024_SetColor(LED1, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
+      LP5024_SetColor(LED0, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
 
       // Update t based on the transition direction
-      speed = SPEED_MIN + (SPEED_MAX - SPEED_MIN) * idleLightingConfig.patternSpeed / 100.0f;
+      speed = SPEED_MIN + (SPEED_MAX - SPEED_MIN) * activeLightingConfig->patternSpeed / 100.0f;
       t += speed * transitionDirection; // Adjust this value to control the speed and direction of the transition
 
       // Check if t reaches the limits and handle accordingly
@@ -287,20 +291,20 @@ void LightingHandler(void)
 
     case PATTERN_RAINBOW_CYCLE:
       // Calculate the hue increment based on pattern speed
-      hueIncrement = (idleLightingConfig.patternSpeed / 100.0f) * HUE_STEP;
+      hueIncrement = (activeLightingConfig->patternSpeed / 100.0f) * HUE_STEP;
 
       // Convert HSV to RGB
       HSVtoRGB(hue, 1.0, 1.0, &r, &g, &b); // Assuming full saturation and value
 
       // Set LED color
-      LP5024_SetColor(LED7, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-      LP5024_SetColor(LED6, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-      LP5024_SetColor(LED5, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-      LP5024_SetColor(LED4, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-      LP5024_SetColor(LED3, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-      LP5024_SetColor(LED2, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-      LP5024_SetColor(LED1, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
-      LP5024_SetColor(LED0, Adjust_Color_Brightness((r << 16) | (g << 8) | b, idleLightingConfig.brightness));
+      LP5024_SetColor(LED7, Adjust_Color_Brightness((r << 16) | (g << 8) | b, activeLightingConfig->brightness));
+      LP5024_SetColor(LED6, Adjust_Color_Brightness((r << 16) | (g << 8) | b, activeLightingConfig->brightness));
+      LP5024_SetColor(LED5, Adjust_Color_Brightness((r << 16) | (g << 8) | b, activeLightingConfig->brightness));
+      LP5024_SetColor(LED4, Adjust_Color_Brightness((r << 16) | (g << 8) | b, activeLightingConfig->brightness));
+      LP5024_SetColor(LED3, Adjust_Color_Brightness((r << 16) | (g << 8) | b, activeLightingConfig->brightness));
+      LP5024_SetColor(LED2, Adjust_Color_Brightness((r << 16) | (g << 8) | b, activeLightingConfig->brightness));
+      LP5024_SetColor(LED1, Adjust_Color_Brightness((r << 16) | (g << 8) | b, activeLightingConfig->brightness));
+      LP5024_SetColor(LED0, Adjust_Color_Brightness((r << 16) | (g << 8) | b, activeLightingConfig->brightness));
 
       // Update hue
       hue = fmodf((hue + hueIncrement), HUE_MAX);

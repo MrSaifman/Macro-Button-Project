@@ -62,6 +62,9 @@ void Error_Handler(void);
 #define BTN1_Pin GPIO_PIN_0
 #define BTN1_GPIO_Port GPIOA
 #define BTN1_EXTI_IRQn EXTI0_1_IRQn
+#define HE_SENSE_Pin GPIO_PIN_1
+#define HE_SENSE_GPIO_Port GPIOA
+#define HE_SENSE_EXTI_IRQn EXTI0_1_IRQn
 #define USART2_TX_Pin GPIO_PIN_2
 #define USART2_TX_GPIO_Port GPIOA
 #define USART2_RX_Pin GPIO_PIN_3
