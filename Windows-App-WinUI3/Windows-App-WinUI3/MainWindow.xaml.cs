@@ -587,7 +587,9 @@ namespace Windows_App_WinUI3
                 // Construct the report data
                 byte[] reportData = new byte[]
                 {
-                    0x01, 0x01, reportValue,
+                    0x01,
+                    ConvertLightModeToByte(currentLightingMode),
+                    reportValue,
                     ColorPickerControl.Color.R,
                     ColorPickerControl.Color.G,
                     ColorPickerControl.Color.B
@@ -632,14 +634,14 @@ namespace Windows_App_WinUI3
             {
                 reportData = new byte[]
                 {
-                    0x01, 0x01, 0x02, 0x00, 0x00, Convert.ToByte(value)
+                    0x01, ConvertLightModeToByte(currentLightingMode), 0x02, 0x00, 0x00, Convert.ToByte(value)
                 };
             }
             else if (settingName == "PatternSpeed")
             {
                 reportData = new byte[]
                 {
-                    0x01, 0x01, 0x01, 0x00, 0x00, Convert.ToByte(value)
+                    0x01, ConvertLightModeToByte(currentLightingMode), 0x01, 0x00, 0x00, Convert.ToByte(value)
                 };
             }
             else
@@ -1004,7 +1006,7 @@ namespace Windows_App_WinUI3
 
             byte[] reportData = new byte[]
             {
-                0x01, 0x01, 0x00, 0x00, 0x00, patternValue
+                0x01, ConvertLightModeToByte(currentLightingMode), 0x00, 0x00, 0x00, patternValue
             };
 
             await deviceManager.ReadWriteToHidDevice(reportData);
@@ -1026,6 +1028,17 @@ namespace Windows_App_WinUI3
                 case "Ease In": return 4;
                 case "Ease Between": return 5;
                 case "Rainbow Cycle": return 6;
+                default: return 0;  // If pattern does not match any case, return 0 (default case)
+            }
+        }
+
+        private byte ConvertLightModeToByte(string mode)
+        {
+            switch (mode)
+            {
+                case "IdleLighting": return 1;
+                case "ButtonPressLighting": return 2;
+                case "LidLiftLighting": return 3;
                 default: return 0;  // If pattern does not match any case, return 0 (default case)
             }
         }
