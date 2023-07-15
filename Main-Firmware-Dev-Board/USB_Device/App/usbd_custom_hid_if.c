@@ -228,12 +228,10 @@ static int8_t CUSTOM_HID_OutEvent_FS(uint8_t *buf)
   * @param  len: The report length
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
-/*
-static int8_t USBD_CUSTOM_HID_SendReport_FS(uint8_t *report, uint16_t len)
+int8_t USBD_CUSTOM_HID_SendReport_FS(uint8_t *report, uint16_t len)
 {
   return USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, report, len);
 }
-*/
 /* USER CODE END 7 */
 
 #ifdef USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED

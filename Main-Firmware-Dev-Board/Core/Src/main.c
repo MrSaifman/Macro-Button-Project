@@ -57,6 +57,7 @@ I2C_HandleTypeDef hi2c1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
+TIM_HandleTypeDef htim6;
 
 UART_HandleTypeDef huart2;
 
@@ -87,6 +88,7 @@ static void MX_I2C1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM4_Init(void);
+static void MX_TIM6_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -129,6 +131,7 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   LP5024_Init();
 
@@ -144,7 +147,7 @@ int main(void)
     if(flag_settingReq){
       tx_buffer[0] = '\0';
       memcpy(tx_buffer, SETT_REQ_CMD, sizeof(SETT_REQ_CMD));
-      USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, tx_buffer, 64);
+      USBD_CUSTOM_HID_SendReport_FS(tx_buffer, 64);
       flag_settingReq = false;
     }
 
@@ -422,6 +425,44 @@ static void MX_TIM4_Init(void)
 }
 
 /**
+  * @brief TIM6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM6_Init(void)
+{
+
+  /* USER CODE BEGIN TIM6_Init 0 */
+
+  /* USER CODE END TIM6_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM6_Init 1 */
+
+  /* USER CODE END TIM6_Init 1 */
+  htim6.Instance = TIM6;
+  htim6.Init.Prescaler = 15999;
+  htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim6.Init.Period = 3000;
+  htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM6_Init 2 */
+
+  /* USER CODE END TIM6_Init 2 */
+
+}
+
+/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -540,9 +581,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(HAL_GPIO_ReadPin(BTN1_GPIO_Port, BTN1_Pin) == GPIO_PIN_RESET){
     	tx_buffer[0] = '\0';
     	memcpy(tx_buffer, BTN_PRESS_CMD, sizeof(BTN_PRESS_CMD));
-		USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, tx_buffer, 64);
-		btn_flag = true;
-		HAL_TIM_Base_Stop_IT(&htim4);
+		  USBD_CUSTOM_HID_SendReport_FS(tx_buffer, 64);
+      btn_flag = true;
+      HAL_TIM_Base_Stop_IT(&htim4);
 	}
   else if(HAL_GPIO_ReadPin(HE_SENSE_GPIO_Port, HE_SENSE_Pin) == GPIO_PIN_SET && htim->Instance == TIM3)
   {
