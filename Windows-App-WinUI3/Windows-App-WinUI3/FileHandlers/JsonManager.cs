@@ -210,11 +210,18 @@ namespace Windows_App_WinUI3.FileHandlers
             string dataDirectory = Path.Combine(projectDirectory, "Data");
             string appsFilePath = Path.Combine(dataDirectory, fileName);
 
+            // Check if file exists
+            if (!File.Exists(appsFilePath))
+            {
+                // If file does not exist, return an empty list
+                return new List<Application>();
+            }
+
             string jsonString = File.ReadAllText(appsFilePath);
 
             if (string.IsNullOrEmpty(jsonString))
             {
-                return null;
+                return new List<Application>();
             }
 
             return JsonSerializer.Deserialize<List<Application>>(jsonString);
