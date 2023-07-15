@@ -627,11 +627,13 @@ namespace Windows_App_WinUI3
 
             string settingName = (string)slider.Tag;
 
-            jsonManager.UpdateSetting(currentLightingMode, settingName, value.ToString());
+            
 
             byte[] reportData;
             if (settingName == "Brightness")
             {
+                jsonManager.UpdateSetting(currentLightingMode, settingName, value.ToString());
+
                 reportData = new byte[]
                 {
                     0x01, ConvertLightModeToByte(currentLightingMode), 0x02, 0x00, 0x00, Convert.ToByte(value)
@@ -639,9 +641,20 @@ namespace Windows_App_WinUI3
             }
             else if (settingName == "PatternSpeed")
             {
+                jsonManager.UpdateSetting(currentLightingMode, settingName, value.ToString());
+                
                 reportData = new byte[]
                 {
                     0x01, ConvertLightModeToByte(currentLightingMode), 0x01, 0x00, 0x00, Convert.ToByte(value)
+                };
+            }
+            else if (settingName == "LightDuration")
+            {
+                jsonManager.UpdateSetting("ButtonConfiguration", settingName, value.ToString());
+                
+                reportData = new byte[]
+                {
+                    0x01, 0x04, 0x01, 0x00, 0x00, Convert.ToByte(value)
                 };
             }
             else
@@ -1098,7 +1111,7 @@ namespace Windows_App_WinUI3
 
             List<byte> reportData = new List<byte>()
             {
-                0x01, 0x04,
+                0x01, 0x05,
             };
 
             foreach (var category in validCategories)
@@ -1120,6 +1133,9 @@ namespace Windows_App_WinUI3
                 reportData.AddRange(buttonColor1);
                 reportData.AddRange(buttonColor2);
             }
+
+            var buttonDuration = byte.Parse(jsonManager.ReadSetting("ButtonConfiguration", "LightDuration"));
+            reportData.Add(buttonDuration);
 
             await deviceManager.ReadWriteToHidDevice(reportData.ToArray());
         }

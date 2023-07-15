@@ -58,6 +58,9 @@ namespace Windows_App_WinUI3.FileHandlers
                                 "'FrameColor2': '#FFFFFFFF'," +
                                 "'ButtonColor1': '#FFFFFFFF'," +
                                 "'ButtonColor2': '#FFFFFFFF'" +
+                            "}," +
+                            "'ButtonConfiguration': {" +
+                                "'LightDuration': 30" +
                             "}" +
                         "}," +
                         "'AppSettings': {" +

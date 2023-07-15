@@ -14,6 +14,7 @@
 LightingConfiguration idleLightingConfig;
 LightingConfiguration buttonPressLightingConfig;
 LightingConfiguration lidLiftLightingConfig;
+ButtonConfiguration buttonConfig;
 
 // Pointer to the active lighting configuration
 LightingConfiguration* activeLightingConfig = &idleLightingConfig;
@@ -46,6 +47,19 @@ void initLightingConfig(void) {
     buttonPressLightingConfig.frameColor2 = 0xFFFFFF;
     buttonPressLightingConfig.buttonColor1 = 0xFFFFFF;
     buttonPressLightingConfig.buttonColor2 = 0xFFFFFF;
+
+    // Default settings for the lid lift lighting on powerup
+    lidLiftLightingConfig.settingChanged = false;
+    lidLiftLightingConfig.pattern = PATTERN_NONE;
+    lidLiftLightingConfig.brightness = 0x10;
+    lidLiftLightingConfig.patternSpeed = 0x32;
+    lidLiftLightingConfig.frameColor1 = 0xFFFFFF;
+    lidLiftLightingConfig.frameColor2 = 0xFFFFFF;
+    lidLiftLightingConfig.buttonColor1 = 0xFFFFFF;
+    lidLiftLightingConfig.buttonColor2 = 0xFFFFFF;
+
+    // Default setting for time duration for button press lighting
+    buttonConfig.lightDuration = 30;
 }
 
 void updateIdleLightingConfig(LightingPattern pattern, uint8_t brightness, uint8_t patternSpeed, uint32_t frameColor1, uint32_t frameColor2, uint32_t buttonColor1, uint32_t buttonColor2)
@@ -107,6 +121,8 @@ void updateBulkLightSettings(uint8_t *report_buffer, uint16_t buffer_length)
     // Move to the start of the next category in buffer
     report_buffer += CATEGORY_SIZE;
   }
+
+  buttonConfig.lightDuration = report_buffer[0];
 }
 
 /**
@@ -157,6 +173,24 @@ void UpdateLightingConfiguration(LightingConfiguration* config, ReportLightEnum 
   }
   // Indicate that the configuration has changed
   config->settingChanged = true;
+}
+
+/**
+ * @brief Update the button configuration based on the report type and value.
+ * @param config: The button configuration to update.
+ * @param report: The type of report which determines what part of the configuration to update.
+ * @param value: The new value to set in the configuration.
+ */
+void UpdateButtonConfiguration(ButtonConfiguration* config, ReportBtnEnum report, uint32_t value) {
+  // Depending on the report type, update the corresponding configuration parameter
+  switch(report) {
+    case REPORT_BUTTON_DURATION:
+      config->lightDuration = value;
+      break;
+    default:
+      // Unknown report type
+      break;
+  }
 }
 
 float lerp(float a, float b, float t) {

@@ -24,6 +24,11 @@ typedef enum {
     REPORT_BUTTON_COLOR2   = 0x06,
 } ReportLightEnum;
 
+// Defines the various types of reports that can be used to update button settings
+typedef enum {
+    REPORT_BUTTON_DURATION = 0x00,
+} ReportBtnEnum;
+
 typedef struct
 {
     bool settingChanged; //Boolean to track is any of these settings got updated
@@ -36,13 +41,20 @@ typedef struct
     uint32_t buttonColor2; //Color: 0x000000 to 0xFFFFFF
 } LightingConfiguration;
 
+typedef struct
+{
+    uint32_t lightDuration; //Time duration for how long light pattern stays light up
+} ButtonConfiguration;
+  
 extern LightingConfiguration idleLightingConfig;
 extern LightingConfiguration buttonPressLightingConfig;
 extern LightingConfiguration lidLiftLightingConfig;
+extern ButtonConfiguration buttonConfig;
 extern LightingConfiguration* activeLightingConfig;
 
 void updateIdleLightingConfig(LightingPattern pattern, uint8_t brightness, uint8_t patternSpeed, uint32_t frameColor1, uint32_t frameColor2, uint32_t buttonColor1, uint32_t buttonColor2);
 void updateButtonPressLightingConfig(LightingPattern pattern, uint8_t brightness, uint8_t patternSpeed, uint32_t frameColor1, uint32_t frameColor2, uint32_t buttonColor1, uint32_t buttonColor2);
 void UpdateLightingConfiguration(LightingConfiguration* config, ReportLightEnum report, uint32_t value);
+void UpdateButtonConfiguration(ButtonConfiguration* config, ReportBtnEnum report, uint32_t value);
 void updateBulkLightSettings(uint8_t *report_buffer, uint16_t buffer_length);
 void LightingHandler(void);

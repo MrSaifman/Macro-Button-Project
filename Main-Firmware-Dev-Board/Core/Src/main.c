@@ -38,7 +38,8 @@
   #define REPORT_IDLE_LIGHT      0x01
   #define REPORT_BUTTON_LIGHT    0x02
   #define REPORT_LID_LIFT_LIGHT  0x03
-  #define BULK_SETTINGS_LOAD     0x04
+  #define REPORT_BUTTON_DURATION 0x04
+  #define BULK_SETTINGS_LOAD     0x05
 
   #define BTN_PRESS_CMD "btn"
   #define SETT_REQ_CMD "req"
@@ -158,6 +159,9 @@ int main(void)
 			} else if (report_buffer[0] == REPORT_LID_LIFT_LIGHT) {
 				uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
 				UpdateLightingConfiguration(&lidLiftLightingConfig, report_buffer[1], theSetting);
+      } else if (report_buffer[0] == REPORT_BUTTON_DURATION) {
+        uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
+        UpdateButtonConfiguration(&buttonConfig, report_buffer[1], theSetting);
 			} else if (report_buffer[0] == BULK_SETTINGS_LOAD) {
 				updateBulkLightSettings(report_buffer, sizeof report_buffer);
         settingsLoaded = true;
@@ -536,6 +540,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             the HAL_TIM_PeriodElapsedCallback could be implemented in the user file
    */
 	if(HAL_GPIO_ReadPin(BTN1_GPIO_Port, BTN1_Pin) == GPIO_PIN_RESET){
+    	tx_buffer[0] = '\0';
+    	memcpy(tx_buffer, BTN_PRESS_CMD, sizeof(BTN_PRESS_CMD));
 		USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, tx_buffer, 64);
 		btn_flag = true;
 		HAL_TIM_Base_Stop_IT(&htim1);
