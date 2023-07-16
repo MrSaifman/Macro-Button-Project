@@ -71,6 +71,7 @@ volatile bool hse_flag = true;
 volatile uint8_t flag = 0;			//Variable to store the button flag
 volatile bool flag_rx = false;	//Variable to store the reception flag
 volatile bool flag_settingReq = false;
+volatile bool flag_btnLight = false;
 volatile uint16_t reqSettingCnt = 0;
 volatile bool settingsLoaded = false;
 volatile bool update_led = false;
@@ -172,7 +173,11 @@ int main(void)
 			flag_rx = false;
 		}
 
-    if(!hse_flag)
+    if(flag_btnLight)
+    {
+      activeLightingConfig = &buttonPressLightingConfig;
+    }
+    else if(!hse_flag)
     {
       activeLightingConfig = &lidLiftLightingConfig;
     } 
@@ -182,7 +187,9 @@ int main(void)
     }
 
 		if (update_led) {
+      
       LightingHandler();
+
 
 			// Reset flag
 			update_led = false;
@@ -584,8 +591,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		  USBD_CUSTOM_HID_SendReport_FS(tx_buffer, 64);
       btn_flag = true;
       HAL_TIM_Base_Stop_IT(&htim4);
+
+      // Set the auto-reload register to light_duration_ms
+      __HAL_TIM_SET_AUTORELOAD(&htim6, buttonConfig.lightDuration*100);
+
+        // Reset the timer counter
+      __HAL_TIM_SET_COUNTER(&htim6, 0);
+
+      // Start the timer
+      HAL_TIM_Base_Start_IT(&htim6);
+
+      flag_btnLight = true;
 	}
-  else if(HAL_GPIO_ReadPin(HE_SENSE_GPIO_Port, HE_SENSE_Pin) == GPIO_PIN_SET && htim->Instance == TIM3)
+  
+  if(HAL_GPIO_ReadPin(HE_SENSE_GPIO_Port, HE_SENSE_Pin) == GPIO_PIN_SET && htim->Instance == TIM3)
   {
     hse_flag = true;
 		HAL_TIM_Base_Stop_IT(&htim3);
@@ -598,6 +617,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     if(!settingsLoaded)
       reqSettingCnt++;
 	}
+
+  if(htim->Instance == TIM6){
+    flag_btnLight = false;
+  }
 }
 
 /* USER CODE END 4 */

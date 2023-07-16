@@ -57,4 +57,4 @@ void updateButtonPressLightingConfig(LightingPattern pattern, uint8_t brightness
 void UpdateLightingConfiguration(LightingConfiguration* config, ReportLightEnum report, uint32_t value);
 void UpdateButtonConfiguration(ButtonConfiguration* config, ReportBtnEnum report, uint32_t value);
 void updateBulkLightSettings(uint8_t *report_buffer, uint16_t buffer_length);
-void LightingHandler(void);
+HAL_StatusTypeDef LightingHandler(void);

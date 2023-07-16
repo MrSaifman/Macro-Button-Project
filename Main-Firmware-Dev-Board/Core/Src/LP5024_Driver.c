@@ -1,6 +1,5 @@
 #include <stdbool.h>
 #include "main.h"
-#include "stm32g0xx_hal_i2c.h"
 #include "LP5024_Driver.h"
 
 extern I2C_HandleTypeDef hi2c1;

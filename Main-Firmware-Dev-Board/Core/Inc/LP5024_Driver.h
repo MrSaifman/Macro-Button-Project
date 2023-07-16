@@ -1,3 +1,5 @@
+#include "stm32g0xx_hal_i2c.h"
+
 #define LP5024_I2C_ADDR_BCST 0x3C //Broadcast Address
 #define LP5024_I2C_ADDR0 0x28 // ADDR0 = GND & ADDR1 = GND
 #define LP5024_I2C_ADDR1 0x29 // ADDR0 = GND & ADDR1 = VCC
