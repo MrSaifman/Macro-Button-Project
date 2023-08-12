@@ -57,14 +57,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define HES_OUT1_Pin GPIO_PIN_2
-#define HES_OUT1_GPIO_Port GPIOA
-#define BTN1_Pin GPIO_PIN_0
-#define BTN1_GPIO_Port GPIOB
-#define HES_OUT2_Pin GPIO_PIN_15
+#define BTN1_Pin GPIO_PIN_13
+#define BTN1_GPIO_Port GPIOC
+#define HES_OUT2_Pin GPIO_PIN_2
 #define HES_OUT2_GPIO_Port GPIOA
-#define LP5024_EN_Pin GPIO_PIN_3
-#define LP5024_EN_GPIO_Port GPIOB
+#define HES_OUT1_Pin GPIO_PIN_9
+#define HES_OUT1_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 
