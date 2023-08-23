@@ -22,6 +22,7 @@
 #include "stm32f0xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "buttonHandler.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,10 +57,8 @@
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_FS;
-extern TIM_HandleTypeDef htim3;
+extern I2C_HandleTypeDef hi2c1;
 extern TIM_HandleTypeDef htim6;
-extern TIM_HandleTypeDef htim7;
-extern TIM_HandleTypeDef htim14;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -145,17 +144,18 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles TIM3 global interrupt.
+  * @brief This function handles EXTI line 4 to 15 interrupts.
   */
-void TIM3_IRQHandler(void)
+void EXTI4_15_IRQHandler(void)
 {
-  /* USER CODE BEGIN TIM3_IRQn 0 */
+  /* USER CODE BEGIN EXTI4_15_IRQn 0 */
+  Button_ISR();
+  /* USER CODE END EXTI4_15_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(HES_OUT1_Pin);
+  HAL_GPIO_EXTI_IRQHandler(BTN1_Pin);
+  /* USER CODE BEGIN EXTI4_15_IRQn 1 */
 
-  /* USER CODE END TIM3_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim3);
-  /* USER CODE BEGIN TIM3_IRQn 1 */
-
-  /* USER CODE END TIM3_IRQn 1 */
+  /* USER CODE END EXTI4_15_IRQn 1 */
 }
 
 /**
@@ -173,31 +173,21 @@ void TIM6_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles TIM7 global interrupt.
+  * @brief This function handles I2C1 event global interrupt / I2C1 wake-up interrupt through EXTI line 23.
   */
-void TIM7_IRQHandler(void)
+void I2C1_IRQHandler(void)
 {
-  /* USER CODE BEGIN TIM7_IRQn 0 */
+  /* USER CODE BEGIN I2C1_IRQn 0 */
 
-  /* USER CODE END TIM7_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim7);
-  /* USER CODE BEGIN TIM7_IRQn 1 */
+  /* USER CODE END I2C1_IRQn 0 */
+  if (hi2c1.Instance->ISR & (I2C_FLAG_BERR | I2C_FLAG_ARLO | I2C_FLAG_OVR)) {
+    HAL_I2C_ER_IRQHandler(&hi2c1);
+  } else {
+    HAL_I2C_EV_IRQHandler(&hi2c1);
+  }
+  /* USER CODE BEGIN I2C1_IRQn 1 */
 
-  /* USER CODE END TIM7_IRQn 1 */
-}
-
-/**
-  * @brief This function handles TIM14 global interrupt.
-  */
-void TIM14_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM14_IRQn 0 */
-
-  /* USER CODE END TIM14_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim14);
-  /* USER CODE BEGIN TIM14_IRQn 1 */
-
-  /* USER CODE END TIM14_IRQn 1 */
+  /* USER CODE END I2C1_IRQn 1 */
 }
 
 /**

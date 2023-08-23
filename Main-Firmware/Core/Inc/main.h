@@ -59,10 +59,14 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define BTN1_Pin GPIO_PIN_13
 #define BTN1_GPIO_Port GPIOC
+#define BTN1_EXTI_IRQn EXTI4_15_IRQn
 #define HES_OUT2_Pin GPIO_PIN_2
 #define HES_OUT2_GPIO_Port GPIOA
 #define HES_OUT1_Pin GPIO_PIN_9
 #define HES_OUT1_GPIO_Port GPIOA
+#define HES_OUT1_EXTI_IRQn EXTI4_15_IRQn
+#define LP5024_EN_Pin GPIO_PIN_5
+#define LP5024_EN_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

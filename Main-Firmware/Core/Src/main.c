@@ -23,26 +23,21 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdbool.h>
+
+#include "usbd_custom_hid_if.h"
+#include "buttonHandler.h"
 #include "LP5024_Driver.h"
 #include "LED_Handler.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+  #define BTN_PRESS_CMD "btn"
+  #define SETT_REQ_CMD "req"
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-  #define REPORT_NONE            0x00
-  #define REPORT_IDLE_LIGHT      0x01
-  #define REPORT_BUTTON_LIGHT    0x02
-  #define REPORT_LID_LIFT_LIGHT  0x03
-  #define REPORT_BUTTON_DURATION 0x04
-  #define BULK_SETTINGS_LOAD     0x05
-
-  #define BTN_PRESS_CMD "btn"
-  #define SETT_REQ_CMD "req"
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -53,10 +48,7 @@
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
 
-TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim6;
-TIM_HandleTypeDef htim7;
-TIM_HandleTypeDef htim14;
 
 /* USER CODE BEGIN PV */
 uint8_t tx_buffer[64];		//Variable to store the output data 
@@ -65,7 +57,6 @@ uint8_t report_buffer[64];		//Variable to receive the report buffer
 volatile bool btn_flag = true;
 volatile bool hse_flag = true;
 
-volatile uint8_t flag = 0;			//Variable to store the button flag
 volatile bool flag_rx = false;	//Variable to store the reception flag
 volatile bool flag_settingReq = false;
 volatile bool flag_btnLight = false;
@@ -75,17 +66,13 @@ volatile bool update_led = false;
 
 //extern the USB handler 
 extern USBD_HandleTypeDef hUsbDeviceFS;
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
-static void MX_TIM3_Init(void);
 static void MX_TIM6_Init(void);
-static void MX_TIM7_Init(void);
-static void MX_TIM14_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -123,79 +110,56 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_I2C1_Init();
-  MX_TIM3_Init();
-  MX_TIM6_Init();
-  MX_TIM7_Init();
-  MX_TIM14_Init();
   MX_USB_DEVICE_Init();
+  MX_I2C1_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   LP5024_Init();
 
   /* Start TIM2 */
-  HAL_TIM_Base_Start_IT(&htim3);
-
+  HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    CheckButtonHoldStatus();
+
     if(flag_settingReq){
       tx_buffer[0] = '\0';
       memcpy(tx_buffer, SETT_REQ_CMD, sizeof(SETT_REQ_CMD));
-      USBD_CUSTOM_HID_SendReport_FS(tx_buffer, 64);
+      USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, tx_buffer, sizeof(tx_buffer));
       flag_settingReq = false;
     }
 
-		if (flag_rx) {
-			//Check if the first byte of the report buffer equals 1
-			if (report_buffer[0] == REPORT_IDLE_LIGHT) {
-				uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
-				UpdateLightingConfiguration(&idleLightingConfig, report_buffer[1], theSetting);
-			} else if (report_buffer[0] == REPORT_BUTTON_LIGHT) {
-				uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
-				UpdateLightingConfiguration(&buttonPressLightingConfig, report_buffer[1], theSetting);
-			} else if (report_buffer[0] == REPORT_LID_LIFT_LIGHT) {
-				uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
-				UpdateLightingConfiguration(&lidLiftLightingConfig, report_buffer[1], theSetting);
-      } else if (report_buffer[0] == REPORT_BUTTON_DURATION) {
-        uint32_t theSetting = (report_buffer[2] << 16) | (report_buffer[3] << 8) | report_buffer[4];
-        UpdateButtonConfiguration(&buttonConfig, report_buffer[1], theSetting);
-			} else if (report_buffer[0] == BULK_SETTINGS_LOAD) {
-				updateBulkLightSettings(report_buffer, sizeof report_buffer);
-        settingsLoaded = true;
-			}
-			flag_rx = false;
-		}
-
     if(flag_btnLight)
     {
-      activeLightingConfig = &buttonPressLightingConfig;
+    	activeLightingConfig = &buttonPressLightingConfig;
     }
     else if(!hse_flag)
     {
-      activeLightingConfig = &lidLiftLightingConfig;
+    	activeLightingConfig = &lidLiftLightingConfig;
     } 
     else
     {
-      activeLightingConfig = &idleLightingConfig;
+    	activeLightingConfig = &idleLightingConfig;
     }
 
-		if (update_led) {
+	if (update_led) {
       
-      LightingHandler();
+		LightingHandler();
 
 
-			// Reset flag
-			update_led = false;
+		// Reset flag
+		update_led = false;
 
-      if(reqSettingCnt > 180)
-      {
-        flag_settingReq = true;
-        reqSettingCnt = 0;
-      }
+		if(reqSettingCnt > 180)
+		{
+			flag_settingReq = true;
+			reqSettingCnt = 0;
 		}
+	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -300,51 +264,6 @@ static void MX_I2C1_Init(void)
 }
 
 /**
-  * @brief TIM3 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_TIM3_Init(void)
-{
-
-  /* USER CODE BEGIN TIM3_Init 0 */
-
-  /* USER CODE END TIM3_Init 0 */
-
-  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-
-  /* USER CODE BEGIN TIM3_Init 1 */
-
-  /* USER CODE END TIM3_Init 1 */
-  htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 1599;
-  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 166;
-  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM3_Init 2 */
-
-  /* USER CODE END TIM3_Init 2 */
-
-}
-
-/**
   * @brief TIM6 Initialization Function
   * @param None
   * @retval None
@@ -360,10 +279,10 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 32000;
+  htim6.Init.Prescaler = 15999;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 50;
-  htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim6.Init.Period = 3000;
+  htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
     Error_Handler();
@@ -371,67 +290,6 @@ static void MX_TIM6_Init(void)
   /* USER CODE BEGIN TIM6_Init 2 */
 
   /* USER CODE END TIM6_Init 2 */
-
-}
-
-/**
-  * @brief TIM7 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_TIM7_Init(void)
-{
-
-  /* USER CODE BEGIN TIM7_Init 0 */
-
-  /* USER CODE END TIM7_Init 0 */
-
-  /* USER CODE BEGIN TIM7_Init 1 */
-
-  /* USER CODE END TIM7_Init 1 */
-  htim7.Instance = TIM7;
-  htim7.Init.Prescaler = 32000;
-  htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim7.Init.Period = 50;
-  htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM7_Init 2 */
-
-  /* USER CODE END TIM7_Init 2 */
-
-}
-
-/**
-  * @brief TIM14 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_TIM14_Init(void)
-{
-
-  /* USER CODE BEGIN TIM14_Init 0 */
-
-  /* USER CODE END TIM14_Init 0 */
-
-  /* USER CODE BEGIN TIM14_Init 1 */
-
-  /* USER CODE END TIM14_Init 1 */
-  htim14.Instance = TIM14;
-  htim14.Init.Prescaler = 15999;
-  htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim14.Init.Period = 3000;
-  htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim14.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
-  if (HAL_TIM_Base_Init(&htim14) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM14_Init 2 */
-
-  /* USER CODE END TIM14_Init 2 */
 
 }
 
@@ -451,47 +309,34 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LP5024_EN_GPIO_Port, LP5024_EN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : BTN1_Pin */
   GPIO_InitStruct.Pin = BTN1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(BTN1_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : HES_OUT2_Pin HES_OUT1_Pin */
   GPIO_InitStruct.Pin = HES_OUT2_Pin|HES_OUT1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PB5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  /*Configure GPIO pin : LP5024_EN_Pin */
+  GPIO_InitStruct.Pin = LP5024_EN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(LP5024_EN_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
-{
-  if(GPIO_Pin == BTN1_Pin && btn_flag == true)
-  {
-		HAL_TIM_Base_Start_IT(&htim7);
-		btn_flag = false;
-	}
-  else if(GPIO_Pin == HES_OUT2_Pin && hse_flag == true)
-  {
-    HAL_TIM_Base_Start_IT(&htim6);
-    hse_flag = false;
-  }
-	else{
-		__NOP();
-	}
-}
-
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   /* Prevent unused argument(s) compilation warning */
@@ -500,42 +345,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* NOTE : This function should not be modified, when the callback is needed,
             the HAL_TIM_PeriodElapsedCallback could be implemented in the user file
    */
-	if(HAL_GPIO_ReadPin(BTN1_GPIO_Port, BTN1_Pin) == GPIO_PIN_RESET){
-    	tx_buffer[0] = '\0';
-    	memcpy(tx_buffer, BTN_PRESS_CMD, sizeof(BTN_PRESS_CMD));
-		  USBD_CUSTOM_HID_SendReport_FS(tx_buffer, 64);
-      btn_flag = true;
-      HAL_TIM_Base_Stop_IT(&htim7);
-
-      // Set the auto-reload register to light_duration_ms
-      __HAL_TIM_SET_AUTORELOAD(&htim14, buttonConfig.lightDuration*100);
-
-        // Reset the timer counter
-      __HAL_TIM_SET_COUNTER(&htim14, 0);
-
-      // Start the timer
-      HAL_TIM_Base_Start_IT(&htim14);
-
-      flag_btnLight = true;
-	}
-  
-  if(HAL_GPIO_ReadPin(HES_OUT2_GPIO_Port, HES_OUT2_Pin) == GPIO_PIN_SET && htim->Instance == TIM6)
-  {
-    hse_flag = true;
-		HAL_TIM_Base_Stop_IT(&htim6);
-  }
-  
-	if(htim->Instance == TIM3){
+	if(htim->Instance == TIM6){
 		// Set flag to update LED
 		update_led = true;
 
     if(!settingsLoaded)
       reqSettingCnt++;
 	}
-
-  if(htim->Instance == TIM14){
-    flag_btnLight = false;
-  }
 }
 /* USER CODE END 4 */
 
