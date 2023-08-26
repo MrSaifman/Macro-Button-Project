@@ -99,44 +99,21 @@ __ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_FS[USBD_CUSTOM_HID_REPORT_DES
 {
   /* USER CODE BEGIN 0 */
 
-  // Usage Page (Generic Desktop Controls)
-    0x05, 0x01,        
-    // Usage (Vendor-Defined)
-    0x09, 0x00,        
-    // Start Collection (Application)
-    0xA1, 0x01,        
-    
-    // Button
-    0x05, 0x09,        // Usage Page (Button)
-    0x19, 0x01,        // Usage Minimum (Button 1)
-    0x29, 0x01,        // Usage Maximum (Button 1)
-    0x15, 0x00,        // Logical Minimum (0)
-    0x25, 0x01,        // Logical Maximum (1)
-    0x95, 0x01,        // Report Count (1)
-    0x75, 0x01,        // Report Size (1 bit)
-    0x81, 0x02,        // Input (Data, Var, Abs)
-    
-    // Two Hall Effect Sensors
-    0x05, 0x09,        // Usage Page (Button)
-    0x19, 0x02,        // Usage Minimum (Button 2)
-    0x29, 0x03,        // Usage Maximum (Button 3)
-    0x95, 0x02,        // Report Count (2)
-    0x75, 0x01,        // Report Size (1 bit)
-    0x81, 0x02,        // Input (Data, Var, Abs)
-
-    // Padding to 1 byte for the above three inputs
-    0x95, 0x05,        // Report Count (5)
-    0x81, 0x03,        // Input (Constant) - 5 bits padding
-
-    // LP5024 LED Controller Commands
-    // Assuming command length is 8 bytes for simplicity
-    0x06, 0x00, 0xFF,  // Usage Page (Vendor-Defined)
-    0x09, 0x01,        // Usage (Vendor-Defined)
-    0x95, 0x08,        // Report Count (8)
-    0x75, 0x08,        // Report Size (8 bits = 1 byte)
-    0x15, 0x00,        // Logical Minimum (0)
-    0x26, 0xFF, 0x00,  // Logical Maximum (255)
-    0x91, 0x02,        // Output (Data, Var, Abs)
+		0x06, 0x00, 0xff, // Usage Page(Undefined )
+		0x09, 0x01, // USAGE (Undefined)
+		0xa1, 0x01, // COLLECTION (Application)
+		0x15, 0x00, // LOGICAL_MINIMUM (0)
+		0x26, 0xff, 0x00, // LOGICAL_MAXIMUM (255)
+		0x75, 0x08, // REPORT_SIZE (8)
+		0x95, 0x40, // REPORT_COUNT (64)
+		0x09, 0x01, // USAGE (Undefined)
+		0x81, 0x02, // INPUT (Data,Var,Abs)
+		0x95, 0x40, // REPORT_COUNT (64)
+		0x09, 0x01, // USAGE (Undefined)
+		0x91, 0x02, // OUTPUT (Data,Var,Abs)
+		0x95, 0x01, // REPORT_COUNT (1)
+		0x09, 0x01, // USAGE (Undefined)
+		0xb1, 0x02, // FEATURE (Data,Var,Abs)
 
   /* USER CODE END 0 */
   0xC0    /*     END_COLLECTION	             */
