@@ -214,7 +214,7 @@ HAL_StatusTypeDef LightingHandler(void)
       break;
       
     case PATTERN_STATIC:
-      status = LP5024_SetColor(LED7, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+      status = LP5024_SetColor(LED7, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
       if(status != HAL_OK) return status;
       status = LP5024_SetColor(LED6, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
       if(status != HAL_OK) return status;
@@ -226,7 +226,7 @@ HAL_StatusTypeDef LightingHandler(void)
       if(status != HAL_OK) return status;
       status = LP5024_SetColor(LED2, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
       if(status != HAL_OK) return status;
-      status = LP5024_SetColor(LED1, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
+      status = LP5024_SetColor(LED1, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
       if(status != HAL_OK) return status;
       status = LP5024_SetColor(LED0, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
       if(status != HAL_OK) return status;
@@ -240,7 +240,7 @@ HAL_StatusTypeDef LightingHandler(void)
       if (t > 1.0f) {
         t = 1.0f; // Set t to 1.0f for a smooth transition without blink
         transitionDirection = -1; // Reverse the transition direction
-        status = LP5024_SetColor(LED7, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+        status = LP5024_SetColor(LED7, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
         status = LP5024_SetColor(LED6, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
@@ -252,7 +252,7 @@ HAL_StatusTypeDef LightingHandler(void)
         if(status != HAL_OK) return status;
         status = LP5024_SetColor(LED2, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
-        status = LP5024_SetColor(LED1, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
+        status = LP5024_SetColor(LED1, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
         status = LP5024_SetColor(LED0, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
@@ -273,7 +273,7 @@ HAL_StatusTypeDef LightingHandler(void)
         t = 1.0f; // Set t to 1.0f for a smooth transition without blink
         transitionDirection = -1; // Reverse the transition direction
         
-        status = LP5024_SetColor(LED7, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
+        status = LP5024_SetColor(LED7, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
         status = LP5024_SetColor(LED6, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
@@ -285,7 +285,7 @@ HAL_StatusTypeDef LightingHandler(void)
         if(status != HAL_OK) return status;
         status = LP5024_SetColor(LED2, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
-        status = LP5024_SetColor(LED1, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
+        status = LP5024_SetColor(LED1, Adjust_Color_Brightness(activeLightingConfig->frameColor1, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
         status = LP5024_SetColor(LED0, Adjust_Color_Brightness(activeLightingConfig->buttonColor1, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
@@ -293,7 +293,7 @@ HAL_StatusTypeDef LightingHandler(void)
         t = -t; // Calculate the absolute value of t
         transitionDirection = 1; // Reverse the transition direction
 
-        status = LP5024_SetColor(LED7, Adjust_Color_Brightness(activeLightingConfig->frameColor2, activeLightingConfig->brightness));
+        status = LP5024_SetColor(LED7, Adjust_Color_Brightness(activeLightingConfig->buttonColor2, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
         status = LP5024_SetColor(LED6, Adjust_Color_Brightness(activeLightingConfig->frameColor2, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
@@ -305,7 +305,7 @@ HAL_StatusTypeDef LightingHandler(void)
         if(status != HAL_OK) return status;
         status = LP5024_SetColor(LED2, Adjust_Color_Brightness(activeLightingConfig->frameColor2, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
-        status = LP5024_SetColor(LED1, Adjust_Color_Brightness(activeLightingConfig->buttonColor2, activeLightingConfig->brightness));
+        status = LP5024_SetColor(LED1, Adjust_Color_Brightness(activeLightingConfig->frameColor2, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
         status = LP5024_SetColor(LED0, Adjust_Color_Brightness(activeLightingConfig->buttonColor2, activeLightingConfig->brightness));
         if(status != HAL_OK) return status;
@@ -324,8 +324,7 @@ HAL_StatusTypeDef LightingHandler(void)
       b = lerp(color1 & 0xFF, color2 & 0xFF, t);
       interpolatedColor = (r << 16) | (g << 8) | b;
 
-      status = LP5024_SetColor(LED7, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
-      if(status != HAL_OK) return status;
+      
       status = LP5024_SetColor(LED6, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
       if(status != HAL_OK) return status;
       status = LP5024_SetColor(LED5, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
@@ -336,6 +335,9 @@ HAL_StatusTypeDef LightingHandler(void)
       if(status != HAL_OK) return status;
       status = LP5024_SetColor(LED2, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
       if(status != HAL_OK) return status;
+      status = LP5024_SetColor(LED1, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
+      if(status != HAL_OK) return status;
+
       // Interpolate between the two button colors
       color1 = activeLightingConfig->buttonColor1;
       color2 = activeLightingConfig->buttonColor2;
@@ -345,7 +347,7 @@ HAL_StatusTypeDef LightingHandler(void)
       interpolatedColor = (r << 16) | (g << 8) | b;
 
       // Set LED color
-      status = LP5024_SetColor(LED1, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
+      status = LP5024_SetColor(LED7, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
       if(status != HAL_OK) return status;
       status = LP5024_SetColor(LED0, Adjust_Color_Brightness(interpolatedColor, activeLightingConfig->brightness));
       if(status != HAL_OK) return status;

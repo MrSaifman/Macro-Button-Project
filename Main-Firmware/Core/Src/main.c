@@ -114,6 +114,8 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
+  HAL_GPIO_WritePin(LP5024_EN_GPIO_Port, LP5024_EN_Pin, GPIO_PIN_SET);
+  HAL_Delay(500); // Delay of 0.5 second
   LP5024_Init();
 
   /* Start TIM2 */
@@ -124,7 +126,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    CheckButtonHoldStatus();
+    //CheckButtonHoldStatus();
 
     if(flag_settingReq){
       tx_buffer[0] = '\0';
@@ -279,9 +281,9 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 32000;
+  htim6.Init.Prescaler = 1599;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 50;
+  htim6.Init.Period = 166;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
