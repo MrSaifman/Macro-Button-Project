@@ -10,8 +10,9 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <ResourceDictionary Source="Dictionaries/AppResourceDictionary.xaml"/>
                 <!-- Other merged dictionaries here -->
+                <ResourceDictionary Source="Dictionaries/Styles.xaml"/>
+                <ResourceDictionary Source="Dictionaries/IconResources.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
         </ResourceDictionary>

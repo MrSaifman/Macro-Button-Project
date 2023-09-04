@@ -1,22 +1,21 @@
 {
   "version": 2,
-  "dgSpecHash": "+jO8v6yxrIlp1PAc27+328p5Tw5Z9BC+D3D6HNXlWEVdUm0bLAxn/ocXTLWICnC46Wa0oIdQ5qMtB3rUqo0sMg==",
+  "dgSpecHash": "ZDjomXPZYtiHbkLUjs13pqwt+o25BUpAzD3il1mOrVrKkjRhMTe9hr1EHu6Xpw/AjBvG/K6GxkvS30cSQ3vsjA==",
   "success": true,
   "projectFilePath": "F:\\Rage-Quit-Button-Project\\Windows-App-WinUI3\\Windows-App-WinUI3\\Windows-App-WinUI3.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\caseh\\.nuget\\packages\\iconextractor\\1.0.1\\iconextractor.1.0.1.nupkg.sha512",
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages\\microsoft.windows.sdk.buildtools\\10.0.22621.755\\microsoft.windows.sdk.buildtools.10.0.22621.755.nupkg.sha512",
-    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.windowsappsdk\\1.2.221109.1\\microsoft.windowsappsdk.1.2.221109.1.nupkg.sha512",
-    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x86\\7.0.5\\microsoft.netcore.app.runtime.win-x86.7.0.5.nupkg.sha512",
+    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.windows.sdk.buildtools\\10.0.22621.756\\microsoft.windows.sdk.buildtools.10.0.22621.756.nupkg.sha512",
+    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.windowsappsdk\\1.4.230822000\\microsoft.windowsappsdk.1.4.230822000.nupkg.sha512",
+    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x86\\6.0.16\\microsoft.netcore.app.runtime.win-x86.6.0.16.nupkg.sha512",
     "C:\\Users\\caseh\\.nuget\\packages\\microsoft.windows.sdk.net.ref\\10.0.19041.28\\microsoft.windows.sdk.net.ref.10.0.19041.28.nupkg.sha512",
-    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x86\\7.0.5\\microsoft.aspnetcore.app.runtime.win-x86.7.0.5.nupkg.sha512",
-    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.netcore.app.runtime.win-arm64\\7.0.5\\microsoft.netcore.app.runtime.win-arm64.7.0.5.nupkg.sha512",
-    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\7.0.5\\microsoft.aspnetcore.app.runtime.win-x64.7.0.5.nupkg.sha512",
-    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-arm64\\7.0.5\\microsoft.windowsdesktop.app.runtime.win-arm64.7.0.5.nupkg.sha512",
-    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\7.0.5\\microsoft.windowsdesktop.app.runtime.win-x64.7.0.5.nupkg.sha512",
-    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-arm64\\7.0.5\\microsoft.aspnetcore.app.runtime.win-arm64.7.0.5.nupkg.sha512",
-    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\7.0.5\\microsoft.netcore.app.runtime.win-x64.7.0.5.nupkg.sha512",
-    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x86\\7.0.5\\microsoft.windowsdesktop.app.runtime.win-x86.7.0.5.nupkg.sha512"
+    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x86\\6.0.16\\microsoft.aspnetcore.app.runtime.win-x86.6.0.16.nupkg.sha512",
+    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.netcore.app.runtime.win-arm64\\6.0.16\\microsoft.netcore.app.runtime.win-arm64.6.0.16.nupkg.sha512",
+    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\6.0.16\\microsoft.aspnetcore.app.runtime.win-x64.6.0.16.nupkg.sha512",
+    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-arm64\\6.0.16\\microsoft.windowsdesktop.app.runtime.win-arm64.6.0.16.nupkg.sha512",
+    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\6.0.16\\microsoft.windowsdesktop.app.runtime.win-x64.6.0.16.nupkg.sha512",
+    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-arm64\\6.0.16\\microsoft.aspnetcore.app.runtime.win-arm64.6.0.16.nupkg.sha512",
+    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\6.0.16\\microsoft.netcore.app.runtime.win-x64.6.0.16.nupkg.sha512",
+    "C:\\Users\\caseh\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x86\\6.0.16\\microsoft.windowsdesktop.app.runtime.win-x86.6.0.16.nupkg.sha512"
   ],
   "logs": []
 }

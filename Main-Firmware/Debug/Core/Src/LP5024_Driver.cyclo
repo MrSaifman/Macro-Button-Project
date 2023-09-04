@@ -1,0 +1,8 @@
+../Core/Src/LP5024_Driver.c:7:19:LP5024_Init	3
+../Core/Src/LP5024_Driver.c:33:19:LP5024_SetColor	1
+../Core/Src/LP5024_Driver.c:47:19:LP5024_SetColor_All	1
+../Core/Src/LP5024_Driver.c:70:19:LP5024_SetBrightness	1
+../Core/Src/LP5024_Driver.c:82:19:LP5024_GlobalOff	2
+../Core/Src/LP5024_Driver.c:98:10:Adjust_Color_Brightness	1
+../Core/Src/LP5024_Driver.c:113:20:LedNum_To_ColorReg	9
+../Core/Src/LP5024_Driver.c:136:6:HSVtoRGB	7

@@ -1,28 +1,15 @@
 {
   "version": 3,
   "targets": {
-    "net7.0-windows10.0.19041": {
-      "IconExtractor/1.0.1": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/IconExtractor.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.0/IconExtractor.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "Microsoft.Windows.SDK.BuildTools/10.0.22621.755": {
+    "net6.0-windows10.0.19041": {
+      "Microsoft.Windows.SDK.BuildTools/10.0.22621.756": {
         "type": "package",
         "build": {
-          "build/Microsoft.Windows.SDK.BuildTools.props": {},
-          "build/Microsoft.Windows.SDK.BuildTools.targets": {}
+          "buildTransitive/Microsoft.Windows.SDK.BuildTools.props": {},
+          "buildTransitive/Microsoft.Windows.SDK.BuildTools.targets": {}
         }
       },
-      "Microsoft.WindowsAppSDK/1.2.221109.1": {
+      "Microsoft.WindowsAppSDK/1.4.230822000": {
         "type": "package",
         "dependencies": {
           "Microsoft.Windows.SDK.BuildTools": "10.0.22621.1"
@@ -54,7 +41,7 @@
             "related": ".xml"
           },
           "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.System.Projection.dll": {},
-          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Projection.dll": {},
+          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Providers.Projection.dll": {},
           "lib/net6.0-windows10.0.18362.0/Microsoft.WindowsAppRuntime.Bootstrap.Net.dll": {}
         },
         "runtime": {
@@ -84,7 +71,7 @@
             "related": ".xml"
           },
           "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.System.Projection.dll": {},
-          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Projection.dll": {},
+          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Providers.Projection.dll": {},
           "lib/net6.0-windows10.0.18362.0/Microsoft.WindowsAppRuntime.Bootstrap.Net.dll": {}
         },
         "build": {
@@ -107,28 +94,15 @@
         }
       }
     },
-    "net7.0-windows10.0.19041/win10-arm64": {
-      "IconExtractor/1.0.1": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/IconExtractor.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.0/IconExtractor.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "Microsoft.Windows.SDK.BuildTools/10.0.22621.755": {
+    "net6.0-windows10.0.19041/win10-arm64": {
+      "Microsoft.Windows.SDK.BuildTools/10.0.22621.756": {
         "type": "package",
         "build": {
-          "build/Microsoft.Windows.SDK.BuildTools.props": {},
-          "build/Microsoft.Windows.SDK.BuildTools.targets": {}
+          "buildTransitive/Microsoft.Windows.SDK.BuildTools.props": {},
+          "buildTransitive/Microsoft.Windows.SDK.BuildTools.targets": {}
         }
       },
-      "Microsoft.WindowsAppSDK/1.2.221109.1": {
+      "Microsoft.WindowsAppSDK/1.4.230822000": {
         "type": "package",
         "dependencies": {
           "Microsoft.Windows.SDK.BuildTools": "10.0.22621.1"
@@ -160,7 +134,7 @@
             "related": ".xml"
           },
           "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.System.Projection.dll": {},
-          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Projection.dll": {},
+          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Providers.Projection.dll": {},
           "lib/net6.0-windows10.0.18362.0/Microsoft.WindowsAppRuntime.Bootstrap.Net.dll": {}
         },
         "runtime": {
@@ -190,7 +164,7 @@
             "related": ".xml"
           },
           "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.System.Projection.dll": {},
-          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Projection.dll": {},
+          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Providers.Projection.dll": {},
           "lib/net6.0-windows10.0.18362.0/Microsoft.WindowsAppRuntime.Bootstrap.Net.dll": {}
         },
         "native": {
@@ -202,28 +176,15 @@
         }
       }
     },
-    "net7.0-windows10.0.19041/win10-x64": {
-      "IconExtractor/1.0.1": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/IconExtractor.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.0/IconExtractor.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "Microsoft.Windows.SDK.BuildTools/10.0.22621.755": {
+    "net6.0-windows10.0.19041/win10-x64": {
+      "Microsoft.Windows.SDK.BuildTools/10.0.22621.756": {
         "type": "package",
         "build": {
-          "build/Microsoft.Windows.SDK.BuildTools.props": {},
-          "build/Microsoft.Windows.SDK.BuildTools.targets": {}
+          "buildTransitive/Microsoft.Windows.SDK.BuildTools.props": {},
+          "buildTransitive/Microsoft.Windows.SDK.BuildTools.targets": {}
         }
       },
-      "Microsoft.WindowsAppSDK/1.2.221109.1": {
+      "Microsoft.WindowsAppSDK/1.4.230822000": {
         "type": "package",
         "dependencies": {
           "Microsoft.Windows.SDK.BuildTools": "10.0.22621.1"
@@ -255,7 +216,7 @@
             "related": ".xml"
           },
           "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.System.Projection.dll": {},
-          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Projection.dll": {},
+          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Providers.Projection.dll": {},
           "lib/net6.0-windows10.0.18362.0/Microsoft.WindowsAppRuntime.Bootstrap.Net.dll": {}
         },
         "runtime": {
@@ -285,7 +246,7 @@
             "related": ".xml"
           },
           "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.System.Projection.dll": {},
-          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Projection.dll": {},
+          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Providers.Projection.dll": {},
           "lib/net6.0-windows10.0.18362.0/Microsoft.WindowsAppRuntime.Bootstrap.Net.dll": {}
         },
         "native": {
@@ -297,28 +258,15 @@
         }
       }
     },
-    "net7.0-windows10.0.19041/win10-x86": {
-      "IconExtractor/1.0.1": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/IconExtractor.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.0/IconExtractor.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "Microsoft.Windows.SDK.BuildTools/10.0.22621.755": {
+    "net6.0-windows10.0.19041/win10-x86": {
+      "Microsoft.Windows.SDK.BuildTools/10.0.22621.756": {
         "type": "package",
         "build": {
-          "build/Microsoft.Windows.SDK.BuildTools.props": {},
-          "build/Microsoft.Windows.SDK.BuildTools.targets": {}
+          "buildTransitive/Microsoft.Windows.SDK.BuildTools.props": {},
+          "buildTransitive/Microsoft.Windows.SDK.BuildTools.targets": {}
         }
       },
-      "Microsoft.WindowsAppSDK/1.2.221109.1": {
+      "Microsoft.WindowsAppSDK/1.4.230822000": {
         "type": "package",
         "dependencies": {
           "Microsoft.Windows.SDK.BuildTools": "10.0.22621.1"
@@ -350,7 +298,7 @@
             "related": ".xml"
           },
           "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.System.Projection.dll": {},
-          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Projection.dll": {},
+          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Providers.Projection.dll": {},
           "lib/net6.0-windows10.0.18362.0/Microsoft.WindowsAppRuntime.Bootstrap.Net.dll": {}
         },
         "runtime": {
@@ -380,7 +328,7 @@
             "related": ".xml"
           },
           "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.System.Projection.dll": {},
-          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Projection.dll": {},
+          "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Providers.Projection.dll": {},
           "lib/net6.0-windows10.0.18362.0/Microsoft.WindowsAppRuntime.Bootstrap.Net.dll": {}
         },
         "native": {
@@ -394,26 +342,10 @@
     }
   },
   "libraries": {
-    "IconExtractor/1.0.1": {
-      "sha512": "CdNcIOMZd3vze9bEFuH+ngAn9L3tMhhlTiVHLoh8vS2V/+nlgQLRQ/dhipl1HRRf6qVtXyLB+R/rPRxzHeRGuQ==",
+    "Microsoft.Windows.SDK.BuildTools/10.0.22621.756": {
+      "sha512": "7ZL2sFSioYm1Ry067Kw1hg0SCcW5kuVezC2SwjGbcPE61Nn+gTbH86T73G3LcEOVj0S3IZzNuE/29gZvOLS7VA==",
       "type": "package",
-      "path": "iconextractor/1.0.1",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "iconextractor.1.0.1.nupkg.sha512",
-        "iconextractor.nuspec",
-        "lib/net40/IconExtractor.dll",
-        "lib/net40/IconExtractor.xml",
-        "lib/netstandard2.0/IconExtractor.dll",
-        "lib/netstandard2.0/IconExtractor.xml",
-        "nupkg-icon.png"
-      ]
-    },
-    "Microsoft.Windows.SDK.BuildTools/10.0.22621.755": {
-      "sha512": "zGXDCZc2/slVjpNtopNETCjnOqH9KiEdo9dPCcjtNWwK5W+EmOcEn7X5Ftj3tOE9kLvroga1s7WwLh2a5jQEEg==",
-      "type": "package",
-      "path": "microsoft.windows.sdk.buildtools/10.0.22621.755",
+      "path": "microsoft.windows.sdk.buildtools/10.0.22621.756",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -580,7 +512,9 @@
         "bin/10.0.22621.0/x86/wintrust.dll.ini",
         "build/Microsoft.Windows.SDK.BuildTools.props",
         "build/Microsoft.Windows.SDK.BuildTools.targets",
-        "microsoft.windows.sdk.buildtools.10.0.22621.755.nupkg.sha512",
+        "buildTransitive/Microsoft.Windows.SDK.BuildTools.props",
+        "buildTransitive/Microsoft.Windows.SDK.BuildTools.targets",
+        "microsoft.windows.sdk.buildtools.10.0.22621.756.nupkg.sha512",
         "microsoft.windows.sdk.buildtools.nuspec",
         "schemas/10.0.22621.0/winrt/AppxManifestSchema.xsd",
         "schemas/10.0.22621.0/winrt/AppxManifestSchema2010_v2.xsd",
@@ -601,10 +535,10 @@
         "schemas/10.0.22621.0/winrt/UapManifestSchema_v8.xsd"
       ]
     },
-    "Microsoft.WindowsAppSDK/1.2.221109.1": {
-      "sha512": "5My+tXeFoC2+jPdLD91KDuEvssEEvrQOONrKmdFE7Upws22ASwyCbF5JglJPnCvrLGhIRqwPsV/zlyX/q5LNgQ==",
+    "Microsoft.WindowsAppSDK/1.4.230822000": {
+      "sha512": "QeR+4u7j0z9RWhVzTbr/5izWmq7k3GkjxCFbXNuYtIHYDm2YcdIH5Kvn+9tpMLweFzDZO7YVzVvvyQGivUtNcw==",
       "type": "package",
-      "path": "microsoft.windowsappsdk/1.2.221109.1",
+      "path": "microsoft.windowsappsdk/1.4.230822000",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
@@ -639,6 +573,7 @@
         "build/Microsoft.Build.Msix.Common.props",
         "build/Microsoft.Build.Msix.Cpp.props",
         "build/Microsoft.Build.Msix.Cpp.targets",
+        "build/Microsoft.Build.Msix.Cs.targets",
         "build/Microsoft.Build.Msix.DesignTime.targets",
         "build/Microsoft.Build.Msix.Packaging.targets",
         "build/Microsoft.Build.Msix.Pri.targets",
@@ -677,7 +612,6 @@
         "build/Microsoft.WindowsAppSDK.UndockedRegFreeWinRT.CS.targets",
         "build/Microsoft.WindowsAppSDK.UndockedRegFreeWinRTCommon.targets",
         "build/Microsoft.WindowsAppSDK.Widgets.targets",
-        "build/Microsoft.WindowsAppSDK.WinUI.Build.props",
         "build/Microsoft.WindowsAppSDK.WinUI.props",
         "build/Microsoft.WindowsAppSDK.WinUI.targets",
         "build/Microsoft.WindowsAppSDK.props",
@@ -691,6 +625,7 @@
         "build/ProjectItemsSchema.xaml",
         "build/README.md",
         "build/Rules/MsixPackageDebugPropertyPage.xaml",
+        "build/Rules/WindowsPackageTypePropertyPage.xaml",
         "build/Rules/af-ZA/MsixPackageDebugPropertyPage.xaml",
         "build/Rules/ar-SA/MsixPackageDebugPropertyPage.xaml",
         "build/Rules/az-Latn-AZ/MsixPackageDebugPropertyPage.xaml",
@@ -797,6 +732,7 @@
         "buildTransitive/Microsoft.Build.Msix.Common.props",
         "buildTransitive/Microsoft.Build.Msix.Cpp.props",
         "buildTransitive/Microsoft.Build.Msix.Cpp.targets",
+        "buildTransitive/Microsoft.Build.Msix.Cs.targets",
         "buildTransitive/Microsoft.Build.Msix.DesignTime.targets",
         "buildTransitive/Microsoft.Build.Msix.Packaging.targets",
         "buildTransitive/Microsoft.Build.Msix.Pri.targets",
@@ -835,7 +771,6 @@
         "buildTransitive/Microsoft.WindowsAppSDK.UndockedRegFreeWinRT.CS.targets",
         "buildTransitive/Microsoft.WindowsAppSDK.UndockedRegFreeWinRTCommon.targets",
         "buildTransitive/Microsoft.WindowsAppSDK.Widgets.targets",
-        "buildTransitive/Microsoft.WindowsAppSDK.WinUI.Build.props",
         "buildTransitive/Microsoft.WindowsAppSDK.WinUI.props",
         "buildTransitive/Microsoft.WindowsAppSDK.WinUI.targets",
         "buildTransitive/Microsoft.WindowsAppSDK.props",
@@ -849,6 +784,7 @@
         "buildTransitive/ProjectItemsSchema.xaml",
         "buildTransitive/README.md",
         "buildTransitive/Rules/MsixPackageDebugPropertyPage.xaml",
+        "buildTransitive/Rules/WindowsPackageTypePropertyPage.xaml",
         "buildTransitive/Rules/af-ZA/MsixPackageDebugPropertyPage.xaml",
         "buildTransitive/Rules/ar-SA/MsixPackageDebugPropertyPage.xaml",
         "buildTransitive/Rules/az-Latn-AZ/MsixPackageDebugPropertyPage.xaml",
@@ -935,7 +871,9 @@
         "include/MddBootstrapAutoInitializer.cpp",
         "include/MddBootstrapAutoInitializer.cs",
         "include/Microsoft.UI.Composition.Interop.h",
+        "include/Microsoft.UI.Dispatching.Interop.h",
         "include/Microsoft.UI.Input.InputCursor.Interop.h",
+        "include/Microsoft.UI.Input.InputPreTranslateSource.Interop.h",
         "include/Microsoft.UI.Interop.h",
         "include/Microsoft.Windows.ApplicationModel.Resources.idl",
         "include/MsixDynamicDependency.h",
@@ -952,8 +890,6 @@
         "include/dwrite_2.h",
         "include/dwrite_3.h",
         "include/dwrite_core.h",
-        "include/microsoft.ui.xaml.hosting.desktopwindowxamlsource.h",
-        "include/microsoft.ui.xaml.hosting.desktopwindowxamlsource.idl",
         "include/microsoft.ui.xaml.hosting.referencetracker.h",
         "include/microsoft.ui.xaml.hosting.referencetracker.idl",
         "include/microsoft.ui.xaml.media.dxinterop.h",
@@ -963,11 +899,15 @@
         "include/wil_msixdynamicdependency.h",
         "include/winrt/Microsoft.UI.Composition.Interop.h",
         "include/winrt/Microsoft.UI.Input.InputCursor.Interop.h",
+        "include/winrt/Microsoft.UI.Input.InputPreTranslateSource.Interop.h",
         "include/winrt/Microsoft.UI.Interop.h",
         "include/winrtdirect3d11.h",
         "include/winrtdirectxcommon.h",
         "include/xamlom.winui.h",
         "include/xamlom.winui.idl",
+        "lib/native/win10-arm64/Microsoft.UI.Dispatching.lib",
+        "lib/native/win10-x64/Microsoft.UI.Dispatching.lib",
+        "lib/native/win10-x86/Microsoft.UI.Dispatching.lib",
         "lib/net6.0-windows10.0.17763.0/Microsoft.InteractiveExperiences.Projection.dll",
         "lib/net6.0-windows10.0.17763.0/Microsoft.InteractiveExperiences.Projection.xml",
         "lib/net6.0-windows10.0.17763.0/Microsoft.WinUI.dll",
@@ -988,7 +928,7 @@
         "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.System.Power.Projection.dll",
         "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.System.Power.Projection.xml",
         "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.System.Projection.dll",
-        "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.Widgets.Projection.dll",
+        "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.Widgets.Providers.Projection.dll",
         "lib/net6.0-windows10.0.17763.0/Microsoft.WindowsAppRuntime.Bootstrap.Net.dll",
         "lib/net6.0-windows10.0.18362.0/Microsoft.InteractiveExperiences.Projection.dll",
         "lib/net6.0-windows10.0.18362.0/Microsoft.InteractiveExperiences.Projection.xml",
@@ -1010,7 +950,7 @@
         "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.System.Power.Projection.dll",
         "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.System.Power.Projection.xml",
         "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.System.Projection.dll",
-        "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Projection.dll",
+        "lib/net6.0-windows10.0.18362.0/Microsoft.Windows.Widgets.Providers.Projection.dll",
         "lib/net6.0-windows10.0.18362.0/Microsoft.WindowsAppRuntime.Bootstrap.Net.dll",
         "lib/uap10.0.17763/Microsoft.Foundation.winmd",
         "lib/uap10.0.17763/Microsoft.Foundation.xml",
@@ -1066,26 +1006,26 @@
         "manifests/Microsoft.InteractiveExperiences.manifest",
         "manifests/Microsoft.WindowsAppSdk.Foundation.manifest",
         "manifests/manifests/Microsoft.WindowsAppSdk.WinUI.manifest",
-        "microsoft.windowsappsdk.1.2.221109.1.nupkg.sha512",
+        "microsoft.windowsappsdk.1.4.230822000.nupkg.sha512",
         "microsoft.windowsappsdk.nuspec",
         "runtimes/win10-arm64/native/Microsoft.WindowsAppRuntime.Bootstrap.dll",
         "runtimes/win10-x64/native/Microsoft.WindowsAppRuntime.Bootstrap.dll",
         "runtimes/win10-x86/native/Microsoft.WindowsAppRuntime.Bootstrap.dll",
         "tools/MSIX/win10-arm64/MSIX.inventory",
-        "tools/MSIX/win10-arm64/Microsoft.WindowsAppRuntime.1.2.msix",
-        "tools/MSIX/win10-arm64/Microsoft.WindowsAppRuntime.DDLM.1.2.msix",
-        "tools/MSIX/win10-arm64/Microsoft.WindowsAppRuntime.Main.1.2.msix",
-        "tools/MSIX/win10-arm64/Microsoft.WindowsAppRuntime.Singleton.1.2.msix",
+        "tools/MSIX/win10-arm64/Microsoft.WindowsAppRuntime.1.4.msix",
+        "tools/MSIX/win10-arm64/Microsoft.WindowsAppRuntime.DDLM.1.4.msix",
+        "tools/MSIX/win10-arm64/Microsoft.WindowsAppRuntime.Main.1.4.msix",
+        "tools/MSIX/win10-arm64/Microsoft.WindowsAppRuntime.Singleton.1.4.msix",
         "tools/MSIX/win10-x64/MSIX.inventory",
-        "tools/MSIX/win10-x64/Microsoft.WindowsAppRuntime.1.2.msix",
-        "tools/MSIX/win10-x64/Microsoft.WindowsAppRuntime.DDLM.1.2.msix",
-        "tools/MSIX/win10-x64/Microsoft.WindowsAppRuntime.Main.1.2.msix",
-        "tools/MSIX/win10-x64/Microsoft.WindowsAppRuntime.Singleton.1.2.msix",
+        "tools/MSIX/win10-x64/Microsoft.WindowsAppRuntime.1.4.msix",
+        "tools/MSIX/win10-x64/Microsoft.WindowsAppRuntime.DDLM.1.4.msix",
+        "tools/MSIX/win10-x64/Microsoft.WindowsAppRuntime.Main.1.4.msix",
+        "tools/MSIX/win10-x64/Microsoft.WindowsAppRuntime.Singleton.1.4.msix",
         "tools/MSIX/win10-x86/MSIX.inventory",
-        "tools/MSIX/win10-x86/Microsoft.WindowsAppRuntime.1.2.msix",
-        "tools/MSIX/win10-x86/Microsoft.WindowsAppRuntime.DDLM.1.2.msix",
-        "tools/MSIX/win10-x86/Microsoft.WindowsAppRuntime.Main.1.2.msix",
-        "tools/MSIX/win10-x86/Microsoft.WindowsAppRuntime.Singleton.1.2.msix",
+        "tools/MSIX/win10-x86/Microsoft.WindowsAppRuntime.1.4.msix",
+        "tools/MSIX/win10-x86/Microsoft.WindowsAppRuntime.DDLM.1.4.msix",
+        "tools/MSIX/win10-x86/Microsoft.WindowsAppRuntime.Main.1.4.msix",
+        "tools/MSIX/win10-x86/Microsoft.WindowsAppRuntime.Singleton.1.4.msix",
         "tools/NOTICE.txt",
         "tools/arm64/GenXbf.dll",
         "tools/net472/Microsoft.Bcl.AsyncInterfaces.dll",
@@ -1106,6 +1046,7 @@
         "tools/net472/System.Collections.Immutable.dll",
         "tools/net472/System.Memory.dll",
         "tools/net472/System.Numerics.Vectors.dll",
+        "tools/net472/System.Reflection.Metadata.dll",
         "tools/net472/System.Runtime.CompilerServices.Unsafe.dll",
         "tools/net472/System.Text.Encodings.Web.dll",
         "tools/net472/System.Text.Json.dll",
@@ -1243,10 +1184,9 @@
     }
   },
   "projectFileDependencyGroups": {
-    "net7.0-windows10.0.19041": [
-      "IconExtractor >= 1.0.1",
-      "Microsoft.Windows.SDK.BuildTools >= 10.0.22621.755",
-      "Microsoft.WindowsAppSDK >= 1.2.221109.1"
+    "net6.0-windows10.0.19041": [
+      "Microsoft.Windows.SDK.BuildTools >= 10.0.22621.756",
+      "Microsoft.WindowsAppSDK >= 1.4.230822000"
     ]
   },
   "packageFolders": {
@@ -1271,7 +1211,7 @@
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "net7.0-windows10.0.19041.0"
+        "net6.0-windows10.0.19041.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -1279,8 +1219,8 @@
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net7.0-windows10.0.19041": {
-          "targetAlias": "net7.0-windows10.0.19041.0",
+        "net6.0-windows10.0.19041": {
+          "targetAlias": "net6.0-windows10.0.19041.0",
           "projectReferences": {}
         }
       },
@@ -1291,20 +1231,16 @@
       }
     },
     "frameworks": {
-      "net7.0-windows10.0.19041": {
-        "targetAlias": "net7.0-windows10.0.19041.0",
+      "net6.0-windows10.0.19041": {
+        "targetAlias": "net6.0-windows10.0.19041.0",
         "dependencies": {
-          "IconExtractor": {
-            "target": "Package",
-            "version": "[1.0.1, )"
-          },
           "Microsoft.Windows.SDK.BuildTools": {
             "target": "Package",
-            "version": "[10.0.22621.755, )"
+            "version": "[10.0.22621.756, )"
           },
           "Microsoft.WindowsAppSDK": {
             "target": "Package",
-            "version": "[1.2.221109.1, )"
+            "version": "[1.4.230822000, )"
           }
         },
         "imports": [
@@ -1321,27 +1257,27 @@
         "downloadDependencies": [
           {
             "name": "Microsoft.AspNetCore.App.Runtime.win-arm64",
-            "version": "[7.0.5, 7.0.5]"
+            "version": "[6.0.16, 6.0.16]"
           },
           {
             "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
-            "version": "[7.0.5, 7.0.5]"
+            "version": "[6.0.16, 6.0.16]"
           },
           {
             "name": "Microsoft.AspNetCore.App.Runtime.win-x86",
-            "version": "[7.0.5, 7.0.5]"
+            "version": "[6.0.16, 6.0.16]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.win-arm64",
-            "version": "[7.0.5, 7.0.5]"
+            "version": "[6.0.16, 6.0.16]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.win-x64",
-            "version": "[7.0.5, 7.0.5]"
+            "version": "[6.0.16, 6.0.16]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.win-x86",
-            "version": "[7.0.5, 7.0.5]"
+            "version": "[6.0.16, 6.0.16]"
           },
           {
             "name": "Microsoft.Windows.SDK.NET.Ref",
@@ -1349,15 +1285,15 @@
           },
           {
             "name": "Microsoft.WindowsDesktop.App.Runtime.win-arm64",
-            "version": "[7.0.5, 7.0.5]"
+            "version": "[6.0.16, 6.0.16]"
           },
           {
             "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
-            "version": "[7.0.5, 7.0.5]"
+            "version": "[6.0.16, 6.0.16]"
           },
           {
             "name": "Microsoft.WindowsDesktop.App.Runtime.win-x86",
-            "version": "[7.0.5, 7.0.5]"
+            "version": "[6.0.16, 6.0.16]"
           }
         ],
         "frameworkReferences": {

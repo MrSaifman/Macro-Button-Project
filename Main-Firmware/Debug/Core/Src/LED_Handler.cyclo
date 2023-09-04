@@ -1,0 +1,8 @@
+../Core/Src/LED_Handler.c:30:6:initLightingConfig	1
+../Core/Src/LED_Handler.c:65:6:updateIdleLightingConfig	1
+../Core/Src/LED_Handler.c:76:6:updateButtonPressLightingConfig	1
+../Core/Src/LED_Handler.c:102:6:updateBulkLightSettings	2
+../Core/Src/LED_Handler.c:134:6:UpdateLightingConfiguration	14
+../Core/Src/LED_Handler.c:184:6:UpdateButtonConfiguration	2
+../Core/Src/LED_Handler.c:196:7:lerp	1
+../Core/Src/LED_Handler.c:200:19:LightingHandler	63

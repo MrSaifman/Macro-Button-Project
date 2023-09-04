@@ -1,0 +1,72 @@
+﻿<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<Window
+    x:Class="Windows_App_WinUI3.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Windows_App_WinUI3"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="#141415">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Row="0" Grid.Column="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+                <Grid x:ConnectionId='2' x:Name="gridDashboard" Grid.Row="0" CornerRadius="10" Background="Transparent"                                                                                           >
+                    <StackPanel Orientation="Horizontal">
+                        <Path Data="{StaticResource HouseIcon}" Width="27" Height="27" Margin="10,0,0,0" Stretch="Uniform" Fill="#FFFFFF"/>
+                        <TextBlock x:ConnectionId='11' x:Name="txtDashboard" Text="Dashboard" FontFamily="Outfit" FontSize="22" Foreground="White" VerticalAlignment="Center" Margin="10,10,0,10"/>
+                    </StackPanel>
+                </Grid>
+                <Grid x:ConnectionId='3' x:Name="gridMacro" Grid.Row="1" CornerRadius="10" Background="Transparent"                                                                                           >
+                    <StackPanel Orientation="Horizontal">
+                        <Path Data="{StaticResource FKeyIcon}" Width="27" Height="27" Margin="10,0,0,0" Stretch="Uniform" Fill="#FFFFFF"/>
+                        <TextBlock x:ConnectionId='10' x:Name="txtMacros" Text="Macros" FontFamily="Outfit" FontSize="22" Foreground="White" VerticalAlignment="Center" Margin="10,10,0,10"/>
+                    </StackPanel>
+                </Grid>
+                <Grid x:ConnectionId='4' x:Name="gridLighting" Grid.Row="2" CornerRadius="10" Background="Transparent"                                                                                           >
+                    <StackPanel Orientation="Horizontal">
+                        <Path Data="{StaticResource LightningIcon}" Width="27" Height="27" Margin="10,0,0,0" Stretch="Uniform" Fill="#FFFFFF"/>
+                        <TextBlock x:ConnectionId='9' x:Name="txtLighting" Text="Lighting" FontFamily="Outfit" FontSize="22" Foreground="White" VerticalAlignment="Center" Margin="10,10,0,10"/>
+                    </StackPanel>
+                </Grid>
+                <Grid x:ConnectionId='5' x:Name="gridHelp" Grid.Row="3" CornerRadius="10" Background="Transparent"                                                                                           >
+                    <StackPanel Orientation="Horizontal">
+                        <Path Data="{StaticResource HelpSquareIcon}" Width="27" Height="27" Margin="10,0,0,0" Stretch="Uniform" Fill="#FFFFFF"/>
+                        <TextBlock x:ConnectionId='8' x:Name="txtHelp" Text="Help" FontFamily="Outfit" FontSize="22" Foreground="White" VerticalAlignment="Center" Margin="10,10,0,10"/>
+                    </StackPanel>
+                </Grid>
+                <Grid x:ConnectionId='6' x:Name="gridSettings" Grid.Row="4" CornerRadius="10" Background="Transparent"                                                                                           >
+                    <StackPanel Orientation="Horizontal">
+                        <Path Data="{StaticResource GearIcon}" Width="27" Height="27" Margin="10,0,0,0" Stretch="Uniform" Fill="#FFFFFF"/>
+                        <TextBlock x:ConnectionId='7' x:Name="txtSettings" Text="Settings" FontFamily="Outfit" FontSize="22" Foreground="White" VerticalAlignment="Center" Margin="10,10,0,10"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <Border Grid.Column="1" BorderThickness="1" BorderBrush="#202022" Margin="10,0"/>
+
+        <Grid Grid.Row="0" Grid.Column="2">
+        </Grid>
+    </Grid>
+</Window>
+
