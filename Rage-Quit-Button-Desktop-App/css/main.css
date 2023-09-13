@@ -1,0 +1,86 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Remove scroll */
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 275px;
+    height: 100%;
+    background-color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+}
+
+.logo {
+    width: 250px;
+    margin-bottom: 30px;
+}
+
+.nav-item {
+    width: calc(100% - 20px); /* Adjusted width */
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 5px 10px 5px 60px;
+    transition: background-color 0.3s, color 0.3s; /* Added transition for color */
+    box-sizing: border-box; /* Ensures padding and border are included in the total width */
+    user-select: none;
+}
+
+.nav-item img, .nav-item svg {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+.clickable {
+    color: white; /* Text color */
+    cursor: pointer; /* Hand cursor on hover */
+}
+
+.nav-item svg path {
+    fill: white; /* Set the default SVG color to white */
+    transition: fill 0.08s ease; /* This line ensures a smooth transition for the fill color */
+}
+
+/* Grey SVG on hover for all buttons except the active one */
+.clickable:not(.active):hover svg path {
+    fill: #a3a3a3; /* Grey text on hover */
+}
+
+/* Grey text on hover for all buttons except the active one */
+.clickable:not(.active):hover {
+    color: #a3a3a3; /* Grey SVG on hover */
+}
+
+.active {
+    background-color: white;
+    border-radius: 5px;
+    color: #333; /* Text color for active state */
+}
+
+.active svg path {
+    fill: #333; /* SVG color for active state */
+}
+
+#content {
+    margin-left: 275px;
+    padding: 20px;
+}
+
+@keyframes bop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.bop-animation {
+    animation: bop 0.3s ease-in-out;
+}

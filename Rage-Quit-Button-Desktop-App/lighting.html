@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/lighting.css">
+</head>
+<body>
+    <div class="lighting-content">
+        <div class="selector-bar">
+            <div class="selector-button active" id="idle-lighting" onclick="handleIdleLighting()">Idle Lighting</div>
+            <div class="selector-button" id="button-press-lighting" onclick="handleButtonPressLighting()">Button Press Lighting</div>
+            <div class="selector-button" id="lid-lift-lighting" onclick="handleLidLiftLighting()">Lid Lift Lighting</div>
+        </div>
+        <div class="selected-title" id="selectedTitle">Idle Lighting</div>
+        <hr class="title-divider">
+
+        <!-- Settings for Idle Lighting -->
+        <div class="settings-container">
+            <div class="setting">
+                <div class="setting-description">
+                    <span class="setting-title">Light up pattern</span>
+                    <span class="setting-subtitle">Choose the light up pattern</span>
+                </div>
+                <div class="custom-select" tabindex="1">
+                    <input class="custom-selectopt" name="light-up-pattern" type="radio" id="none" checked>
+                    <label for="none" class="custom-option">None</label>
+                
+                    <input class="custom-selectopt" name="light-up-pattern" type="radio" id="static">
+                    <label for="static" class="custom-option">Static</label>
+                
+                    <input class="custom-selectopt" name="light-up-pattern" type="radio" id="blink">
+                    <label for="blink" class="custom-option">Blink</label>
+                
+                    <input class="custom-selectopt" name="light-up-pattern" type="radio" id="blink-between">
+                    <label for="blink-between" class="custom-option">Blink Between</label>
+                
+                    <input class="custom-selectopt" name="light-up-pattern" type="radio" id="ease-in">
+                    <label for="ease-in" class="custom-option">Ease In</label>
+                
+                    <input class="custom-selectopt" name="light-up-pattern" type="radio" id="ease-between">
+                    <label for="ease-between" class="custom-option">Ease Between</label>
+                
+                    <input class="custom-selectopt" name="light-up-pattern" type="radio" id="rainbow-cycle">
+                    <label for="rainbow-cycle" class="custom-option">Rainbow cycle</label>
+                </div>
+                
+                
+            </div>
+            <hr class="setting-divider">
+
+            <div class="setting">
+                <div class="setting-description">
+                    <span class="setting-title">Frame Color 1</span>
+                    <span class="setting-subtitle">Choose the first frame color</span>
+                </div>
+                <input type="color" id="frame-color-1">
+            </div>
+            <hr class="setting-divider">
+
+            <div class="setting">
+                <div class="setting-description">
+                    <span class="setting-title">Button Color 1</span>
+                    <span class="setting-subtitle">Choose the first button color</span>
+                </div>
+                <input type="color" id="button-color-1">
+            </div>
+            <hr class="setting-divider">
+
+            <div class="setting">
+                <div class="setting-description">
+                    <span class="setting-title">Frame Color 2</span>
+                    <span class="setting-subtitle">Choose the second frame color</span>
+                </div>
+                <input type="color" id="frame-color-2">
+            </div>
+            <hr class="setting-divider">
+
+            <div class="setting">
+                <div class="setting-description">
+                    <span class="setting-title">Button Color 2</span>
+                    <span class="setting-subtitle">Choose the second button color</span>
+                </div>
+                <input type="color" id="button-color-2">
+            </div>
+            <hr class="setting-divider">
+
+            <div class="setting">
+                <div class="setting-description">
+                    <span class="setting-title">Brightness</span>
+                    <span class="setting-subtitle">Adjust the brightness level</span>
+                </div>
+                <input type="range" id="brightness-slider" min="0" max="100">
+            </div>
+            <hr class="setting-divider">
+
+            <div class="setting">
+                <div class="setting-description">
+                    <span class="setting-title">Pattern Speed</span>
+                    <span class="setting-subtitle">Adjust the speed of the pattern</span>
+                </div>
+                <input type="range" id="pattern-speed-slider" min="0" max="100">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
